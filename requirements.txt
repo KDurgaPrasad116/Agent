@@ -1,0 +1,45 @@
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+
+# ── Data validation ───────────────────────────────────────────────────────────
+pydantic==2.8.2
+
+# ── File parsing ──────────────────────────────────────────────────────────────
+PyPDF2==3.0.1
+python-docx==1.1.2
+
+# ── ML / NLP core ─────────────────────────────────────────────────────────────
+torch==2.4.0
+transformers==4.44.2
+sentence-transformers==3.1.1
+accelerate==0.34.2
+safetensors==0.4.5
+
+# ── Local LLM for chatbot (no Ollama needed) ──────────────────────────────────
+# google/flan-t5-base is downloaded automatically via transformers
+# ~250MB, CPU-friendly, no API key required
+sentencepiece==0.2.0      # required by flan-t5 tokenizer
+
+# ── RAG stack ─────────────────────────────────────────────────────────────────
+langchain==0.3.1
+langchain-community==0.3.1
+langchain-core==0.3.6
+langchain-text-splitters==0.3.0
+faiss-cpu==1.8.0
+
+# ── Language detection ────────────────────────────────────────────────────────
+langdetect==1.0.9
+
+# ── Translation (MarianMT — offline, no API key) ──────────────────────────────
+# Helsinki-NLP/opus-mt-hi-en and opus-mt-kn-en downloaded via transformers
+# No extra package needed
+
+# ── Training utilities ────────────────────────────────────────────────────────
+scikit-learn==1.5.2
+pandas==2.2.2
+numpy==1.26.4
+
+# ── HTTP (kept for optional future integrations) ──────────────────────────────
+requests==2.32.3
