@@ -250,7 +250,6 @@ async def run_multilingual_pipeline(
             "risk_score":      scores["risk_score"],
             "benefit_score":   scores["benefit_score"],
             "risk_flags":      scores["risk_flags"],
-            "rag_context":     rag_context,
         })
 
     # Step 7 — Document-level summary

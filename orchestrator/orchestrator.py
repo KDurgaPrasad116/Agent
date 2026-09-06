@@ -54,7 +54,6 @@ class Orchestrator:
                 "risk_score":        risk["risk_score"],
                 "benefit_score":     risk["benefit_score"],
                 "risk_factors":      risk["risk_factors"],
-                "rag_context":       compliance["rag_context"],
                 "explanation": (
                     f"{classification['type']} clause. "
                     f"Risk: {risk['risk_score']}/10. "

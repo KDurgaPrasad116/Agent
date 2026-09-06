@@ -1,0 +1,11 @@
+This is a sample legal document for the RAG corpus.
+It contains standard clauses regarding termination, liability, and governing law.
+
+TERMINATION
+Either party may terminate this agreement upon 30 days written notice.
+
+LIABILITY
+In no event shall either party be liable for any indirect, special, or consequential damages.
+
+GOVERNING LAW
+This agreement shall be governed by the laws of the State of Delaware.

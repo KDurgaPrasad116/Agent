@@ -46,5 +46,4 @@ class ComplianceAgent:
         return {
             "is_legal":          is_legal,
             "illegality_reason": reason,
-            "rag_context":       rag_context,
         }

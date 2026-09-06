@@ -1,3 +1,9 @@
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from agents.input_agent import InputAgent
 from agents.clause_splitter_agent import ClauseSplitterAgent
 from orchestrator.orchestrator import Orchestrator
+from routes import analyze_router, chat_router
 
 app = FastAPI(
     title="Legal AI Advisor",
@@ -22,6 +29,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Register New Routers ──────────────────────────────────────────────────────
+app.include_router(analyze_router)
+app.include_router(chat_router)
+
 # ── Initialise agents once at startup ────────────────────────────────────────
 _orchestrator  = Orchestrator()
 _input_agent   = InputAgent()
@@ -35,6 +46,8 @@ def home():
         "version": "2.0.0",
         "endpoints": {
             "analyze":  "POST /analyze",
+            "analyze_multilingual": "POST /analyze/multilingual",
+            "chat": "POST /chat",
             "docs":     "GET  /docs",
         },
     }
@@ -44,7 +57,7 @@ def home():
 async def analyze(file: UploadFile = File(...)):
     """
     Analyze a legal document.
-    Accepts: PDF, DOCX, TXT
+    Accepts: PDF, DOCX, TXT, MD, JSON, CSV, XLSX, XLS, HTML, PNG, JPG, JPEG
     Returns: clause classification, risk scores, legality flags, decision
     """
     try:

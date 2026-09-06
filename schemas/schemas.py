@@ -9,7 +9,6 @@ class ClauseResult(BaseModel):
     risk_score: int          # 1–10
     benefit_score: int       # 1–10
     risk_factors: List[str]
-    rag_context: Optional[str]
     explanation: str
     action: Literal["Accept", "Review", "Reject"]
 

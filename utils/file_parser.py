@@ -1,112 +1,68 @@
 """
-Translation utility using Helsinki-NLP MarianMT models via HuggingFace.
-All models run locally — no API key required.
-
-Supported source → English:
-  Hindi  (hi) → English (en) : Helsinki-NLP/opus-mt-hi-en
-  Kannada (kn) → English (en): Helsinki-NLP/opus-mt-kn-en
-
-Models are downloaded on first use and cached in ~/.cache/huggingface/
+Unified file parser for various formats.
 """
 
-from transformers import MarianMTModel, MarianTokenizer
-from typing import Optional
-import logging
+import io
+from PyPDF2 import PdfReader
+from docx import Document
+import pandas as pd
+from bs4 import BeautifulSoup
 
-logger = logging.getLogger(__name__)
+# Lazy load easyocr since it can be heavy
+_reader = None
+def get_ocr_reader():
+    global _reader
+    if _reader is None:
+        import easyocr
+        _reader = easyocr.Reader(['en'])
+    return _reader
 
-# Model registry: source_lang_code → HuggingFace model name
-TRANSLATION_MODELS = {
-    "hi": "Helsinki-NLP/opus-mt-hi-en",
-    "kn": "Helsinki-NLP/opus-mt-kn-en",
-}
-
-# In-memory model cache so we don't reload on every request
-_model_cache: dict = {}
-
-
-def _load_model(lang_code: str):
-    """Load and cache a MarianMT model for the given source language."""
-    if lang_code in _model_cache:
-        return _model_cache[lang_code]
-
-    model_name = TRANSLATION_MODELS.get(lang_code)
-    if not model_name:
-        raise ValueError(f"No translation model available for language code: '{lang_code}'")
-
-    logger.info(f"Loading translation model: {model_name}")
-    tokenizer = MarianTokenizer.from_pretrained(model_name)
-    model     = MarianMTModel.from_pretrained(model_name)
-    model.eval()
-
-    _model_cache[lang_code] = (tokenizer, model)
-    logger.info(f"Translation model loaded: {model_name}")
-    return _model_cache[lang_code]
-
-
-def translate_to_english(text: str, source_lang: str) -> str:
+def parse_file(file) -> str:
     """
-    Translate text from source_lang to English.
-
-    Args:
-        text:        The text to translate.
-        source_lang: ISO 639-1 language code (e.g. 'hi', 'kn').
-
-    Returns:
-        Translated English text, or original text if translation not needed/available.
+    Extract plain text from an uploaded FastAPI UploadFile.
     """
-    if source_lang == "en":
-        return text
+    content = file.file.read()
+    return parse_bytes(content, file.filename)
 
-    if source_lang not in TRANSLATION_MODELS:
-        logger.warning(
-            f"No translation model for '{source_lang}'. Returning original text."
-        )
-        return text
+def parse_bytes(content: bytes, filename: str) -> str:
+    """
+    Extract plain text from raw bytes.
+    Useful when the file has already been read into memory.
+    """
+    filename = filename.lower()
 
-    try:
-        tokenizer, model = _load_model(source_lang)
+    if filename.endswith(".pdf"):
+        reader = PdfReader(io.BytesIO(content))
+        return "".join(p.extract_text() or "" for p in reader.pages)
 
-        # Split into chunks of max 400 chars to stay within model token limits
-        chunks     = _chunk_text(text, max_chars=400)
-        translated = []
+    elif filename.endswith(".docx"):
+        doc = Document(io.BytesIO(content))
+        return "\n".join(p.text for p in doc.paragraphs)
 
-        for chunk in chunks:
-            if not chunk.strip():
-                continue
-            inputs = tokenizer(
-                [chunk],
-                return_tensors="pt",
-                padding=True,
-                truncation=True,
-                max_length=512,
-            )
-            output_ids = model.generate(**inputs, max_length=512)
-            decoded    = tokenizer.decode(output_ids[0], skip_special_tokens=True)
-            translated.append(decoded)
+    elif filename.endswith((".txt", ".md", ".json")):
+        try:
+            return content.decode("utf-8")
+        except UnicodeDecodeError:
+            return content.decode("latin-1")
 
-        return " ".join(translated)
-
-    except Exception as e:
-        logger.error(f"Translation failed for lang '{source_lang}': {e}")
-        return text  # graceful fallback — return original
-
-
-def _chunk_text(text: str, max_chars: int = 400) -> list[str]:
-    """Split text into sentence-aware chunks under max_chars."""
-    sentences = text.replace("\n", " ").split(". ")
-    chunks    = []
-    current   = ""
-
-    for sentence in sentences:
-        if len(current) + len(sentence) + 2 <= max_chars:
-            current += sentence + ". "
+    elif filename.endswith((".csv", ".xlsx", ".xls")):
+        if filename.endswith(".csv"):
+            df = pd.read_csv(io.BytesIO(content))
         else:
-            if current:
-                chunks.append(current.strip())
-            current = sentence + ". "
+            df = pd.read_excel(io.BytesIO(content))
+        return df.to_string(index=False)
 
-    if current.strip():
-        chunks.append(current.strip())
+    elif filename.endswith(".html"):
+        soup = BeautifulSoup(content, "html.parser")
+        return soup.get_text(separator="\n")
 
-    return chunks if chunks else [text]
+    elif filename.endswith((".png", ".jpg", ".jpeg")):
+        reader = get_ocr_reader()
+        result = reader.readtext(content, detail=0)
+        return "\n".join(result)
+
+    else:
+        raise ValueError(
+            f"Unsupported file format '{filename}'. "
+            "Accepted formats: .pdf, .docx, .txt, .md, .json, .csv, .xlsx, .xls, .html, .png, .jpg, .jpeg"
+        )
