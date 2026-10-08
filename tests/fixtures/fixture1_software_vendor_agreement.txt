@@ -1,0 +1,30 @@
+SOFTWARE & VENDOR AGREEMENT
+(Sample Test Fixture — Fictional Parties)
+
+TEST FIXTURE DISCLAIMER: This document is a synthetic sample created for benchmarking automated legal-risk-assessment and contract compliance systems. It intentionally contains one-sided, high-risk, and predatory clauses. It does not represent a real agreement between real parties, must not be signed or executed, and must not be used as a template for an actual contract.
+
+This Agreement ("Agreement") is entered into between Fictional Company Holdings, Inc. ("Company") and Test Contractor / Vendor ("Contractor"), collectively the "Parties," effective as of the date of last signature below.
+
+1. WAIVER OF LEGAL RIGHTS
+By executing this Agreement, Contractor irrevocably waives all rights to seek legal remedies, counterclaims, or statutory protections arising from or related to this Agreement, including but not limited to any rights afforded under consumer protection, labor, or commercial statutes in any applicable jurisdiction.
+
+2. INDEMNIFICATION AND LIABILITY
+Contractor agrees to provide unlimited indemnification for all breach, penalty, and consequential damages arising in connection with this Agreement, regardless of cause, fault, or foreseeability, and regardless of whether such damages arise from Company's own negligence or willful misconduct.
+
+3. AMENDMENT OF TERMS
+Company reserves the right to unilaterally modify and amend the terms, fees, and deliverables at any time without notice, and any continued performance by Contractor following such modification shall constitute binding acceptance of the amended terms.
+
+4. LATE DELIVERY PENALTIES
+In the event of any late delivery, regardless of cause, Contractor shall forfeit all compensation and a liquidated damages penalty of 50% of the total contract value shall become immediately due and payable to Company, in addition to any other remedies available to Company under this Agreement.
+
+5. PAYMENTS AND REFUNDS
+All payments made to Company are final. There shall be no refund under any circumstance, including but not limited to non-delivery, termination, cancellation, or dissatisfaction with deliverables.
+
+6. DATA USE AND PRIVACY
+Company reserves the right to sell personal data and personal information to third-party commercial partners for any purpose, without further consent from or notice to Contractor or any data subject.
+
+7. INTELLECTUAL PROPERTY ASSIGNMENT
+Contractor hereby grants to Company a perpetual and irrevocable license with no royalty to all work product, ideas, inventions, and prior creations of Contractor, whether or not related to this Agreement, whether created before or after the Effective Date, worldwide and in all media now known or later devised.
+
+8. DISPUTE RESOLUTION
+Any dispute, claim, or controversy arising out of or relating to this Agreement shall be resolved through arbitration only, with no class action permitted, and Contractor expressly waives any right to participate in a class, collective, or representative action against Company.

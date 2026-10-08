@@ -9,6 +9,10 @@ class ClauseResult(BaseModel):
     risk_score: int          # 1–10
     benefit_score: int       # 1–10
     risk_factors: List[str]
+<<<<<<< HEAD
+=======
+    rag_context: Optional[str]
+>>>>>>> 3a27112 (Pushing major agent changes)
     explanation: str
     action: Literal["Accept", "Review", "Reject"]
 

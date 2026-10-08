@@ -1,0 +1,16 @@
+STATUTORY CONTRACT LAW PRINCIPLES AND ENFORCEABILITY GUIDELINES
+
+1. Unconscionability and Unfair Terms:
+A contract clause is legally unconscionable and unenforceable if there is a gross disparity in bargaining power combined with terms that unreasonably favor one party. Adhesion contracts with oppressive, hidden, or non-negotiated clauses that divest a consumer or smaller business of fundamental rights are regularly struck down by courts under standard contract doctrine and Section 23 of the Indian Contract Act / UCC Article 2-302.
+
+2. Liquidated Damages vs. Unenforceable Penalties:
+Parties may agree in advance to reasonable liquidated damages that represent a genuine pre-estimate of damages resulting from a breach. However, clauses stipulating exorbitant, disproportionate, or punitive sums, or requiring immediate total forfeiture of fees or deposits without regard to actual loss suffered, constitute an illegal penalty and are void under Section 74 of the Indian Contract Act and general common law principles.
+
+3. Restraint of Trade, Profession, or Legal Rights:
+Every agreement by which anyone is restrained from exercising a lawful profession, trade, or business of any kind is void to that extent (Section 27, Indian Contract Act). Blanket post-employment non-compete clauses prohibiting individuals from earning a livelihood are void and unenforceable in many jurisdictions.
+
+4. Unilateral Modification Rights:
+A clause granting one party the unmitigated, unfettered right to unilaterally modify substantive contract terms, pricing, duties, or scope of service at its sole discretion without notice or mutual consent violates the requirement of mutuality of obligation and constitutes an unfair contract term.
+
+5. Blanket Waivers and Forfeitures:
+Agreements in which a party completely waives statutory legal remedies, procedural counterclaims, rights to appeal, or statutory protections are against public policy and void under Section 28 of the Indian Contract Act.

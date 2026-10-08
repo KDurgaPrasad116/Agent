@@ -1,0 +1,13 @@
+CONSUMER PROTECTION, DATA PRIVACY, AND LIABILITY DOCTRINES
+
+1. Commercial Exploitation and Sale of Personal Data:
+Modern privacy regulations, including GDPR, California Consumer Privacy Act (CCPA), and the Digital Personal Data Protection Act (DPDP), prohibit the unauthorized sale or transfer of user personal data, telemetry, or personally identifiable information (PII) to third-party data brokers or advertisers without explicit, informed, granular, and freely given consent. Blanket clauses reserving the right to monetize or sell user data without consent are unlawful.
+
+2. Unreasonable Indemnification and Unlimited Liability:
+Clauses demanding unlimited, uncapped indemnification from a consumer or service provider for consequential, indirect, punitive, or speculative damages, or requiring indemnification for the other party's own negligence or misconduct, are commercially predatory, highly dangerous, and often void against public policy. Standard fair contracts impose reasonable caps (e.g., total fees paid in the past 12 months) and exclude liability for gross negligence.
+
+3. Strict No-Refund and Cancellation Restrictions:
+Absolute "no refund under any circumstance" clauses in standard form consumer agreements frequently violate statutory consumer protection regulations. Where services are deficient, cancelled by the vendor, or terminated for convenience, statutory consumer rights mandate fair pro-rata refunds.
+
+4. Dispute Resolution and Mandatory Arbitration:
+Mandatory binding arbitration clauses requiring consumers or employees to arbitrate in distant, cost-prohibitive forums while completely waiving rights to participate in class actions or statutory regulatory complaints are scrutinized as unfair contract terms. While mutual arbitration is permissible, one-sided arbitration where only one party retains judicial rights is void.

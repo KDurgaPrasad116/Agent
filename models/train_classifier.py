@@ -77,7 +77,10 @@ def train():
     df = pd.read_csv("dataset/clauses_train.csv")
     df.dropna(subset=["clause", "label"], inplace=True)
     df["label"] = df["label"].str.strip()
+<<<<<<< HEAD
     df = df.sample(20, random_state=42)  # Added to prevent OOM
+=======
+>>>>>>> 3a27112 (Pushing major agent changes)
 
     print(f"Loaded {len(df)} rows")
     print(df["label"].value_counts())
@@ -117,21 +120,36 @@ def train():
     args = TrainingArguments(
         output_dir=SAVE_PATH,
         num_train_epochs=3,                   # Reduced from 5 → faster training
+<<<<<<< HEAD
         per_device_train_batch_size=2,         # Reduced from 8 to 2 to prevent OOM
         gradient_accumulation_steps=4,         # Accumulate to effective batch size of 8
         per_device_eval_batch_size=2,          # Reduced from 8 to 2
+=======
+        per_device_train_batch_size=8,         # Reduced from 16 → less RAM usage
+        per_device_eval_batch_size=8,          # Reduced from 16 → less RAM usage
+>>>>>>> 3a27112 (Pushing major agent changes)
         learning_rate=2e-5,
         eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
         greater_is_better=True,
+<<<<<<< HEAD
         weight_decay=0.01,
         logging_steps=50,                      # More frequent logs on small data
         report_to="none",
         fp16=False,                            # Disabled — fp16 not supported on CPU
         use_cpu=True,
         dataloader_num_workers=0,              # Safer on CPU, avoids multiprocessing issues
+=======
+        warmup_ratio=0.1,
+        weight_decay=0.01,
+        logging_steps=50,                      # More frequent logs on small data
+        logging_dir="models/logs",
+        report_to="none",
+        fp16=False,                            # Disabled — fp16 not supported on CPU
+        dataloader_num_workers=0,              # Safer on CPU, avoids multiprocessing issues                          # Force CPU explicitly
+>>>>>>> 3a27112 (Pushing major agent changes)
     )
 
     trainer = WeightedTrainer(

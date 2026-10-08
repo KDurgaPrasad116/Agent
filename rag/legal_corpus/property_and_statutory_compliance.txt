@@ -1,0 +1,31 @@
+PROPERTY CONVEYANCE AND STATUTORY COMPLIANCE PRINCIPLES (INDIAN LAW)
+
+1. Absolute Restraint on Alienation (Section 10, Transfer of Property Act, 1882):
+Under Section 10 of the Transfer of Property Act, 1882, any condition or covenant in a deed of transfer that absolutely restrains the transferee or their successors from parting with, selling, mortgaging, or disposing of their interest in the property is void ab initio. A seller of absolute ownership cannot retain a veto or reclamation right over future transfers.
+
+2. Prohibition of Discrimination & Public Policy (Article 15, Constitution of India & Section 23, Indian Contract Act):
+Covenants restricting the sale, lease, or transfer of immovable property based on religion, caste, creed, or community are unconstitutional, contrary to public policy, and void under Section 23 of the Indian Contract Act, 1872.
+
+3. Mandatory Registration and Conveyance Formalities (Section 17 & 49, Registration Act, 1908; Section 54, Transfer of Property Act):
+An instrument of sale of immovable property having a value of one hundred rupees or more must be registered before the Sub-Registrar. An unregistered sale deed does not transfer title, convey ownership, or affect the immovable property comprised therein. Agreements to evade registration or stamp duty are unlawful and void.
+
+4. Fraudulent Undervaluation and Stamp Duty Evasion (Indian Stamp Act, 1899 & Section 23, Indian Contract Act):
+Agreements to falsely state consideration, declare suppressed market values, or conceal transactions from the Sub-Registrar or Income Tax Department are unlawful, fraudulent, and punishable under criminal law and tax statutes.
+
+5. Unilateral Revocation of Conveyance:
+Once an absolute sale deed is executed and registered, the transfer of ownership is complete. A vendor cannot unilaterally cancel or revoke a registered sale deed without a decree from a competent civil court under the Specific Relief Act, 1963.
+
+6. Restraint of Legal Proceedings and Stifling Criminal Prosecution (Sections 23 & 28, Indian Contract Act):
+Agreements restricting a party absolutely from enforcing legal rights through ordinary tribunals, or waiving remedies for future fraud, cheating, forgery, or defect in title, are void under Section 28. Agreements stifling criminal prosecution or promising not to file police reports for criminal offences are void under Section 23.
+
+7. Unconscionable Penalties and Forfeitures (Section 74, Indian Contract Act):
+Forfeiture of entire sale consideration for minor breach, extortionate penal interest (such as 10% per month compounding), or arbitrary punitive liquidated damages are unenforceable penalties under Section 74.
+
+8. Unilateral Appointment of Sole Arbitrator:
+Under Section 12(5) of the Arbitration and Conciliation Act, 1996 read with the Seventh Schedule (and the Supreme Court ruling in Perkins Eastman Architects), an interested party cannot unilaterally appoint a sole arbitrator whose decision is declared non-challengeable.
+
+9. Prohibition of Benami Property Transactions Act, 1988:
+Holding property in the name of one person while the beneficial consideration and ownership remain with another constitutes a prohibited benami transaction. Any contract to create or enforce benami ownership is void and prohibited by law.
+
+10. Prevention of Corruption Act, 1988 & Bribery:
+Agreements to pay cash gratification, speed money, or bribes to public servants (including registration officials) have an illegal consideration and are void ab initio under Section 23 of the Indian Contract Act and punishable under Sections 7 and 12 of the Prevention of Corruption Act.

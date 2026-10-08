@@ -34,7 +34,11 @@ async def analyze_multilingual(file: UploadFile = File(...)):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided.")
 
+<<<<<<< HEAD
     allowed = (".pdf", ".docx", ".txt", ".md", ".json", ".csv", ".xlsx", ".xls", ".html", ".png", ".jpg", ".jpeg")
+=======
+    allowed = (".pdf", ".docx", ".txt")
+>>>>>>> 3a27112 (Pushing major agent changes)
     if not any(file.filename.lower().endswith(ext) for ext in allowed):
         raise HTTPException(
             status_code=400,

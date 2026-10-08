@@ -9,6 +9,7 @@ pydantic==2.8.2
 # ── File parsing ──────────────────────────────────────────────────────────────
 PyPDF2==3.0.1
 python-docx==1.1.2
+<<<<<<< HEAD
 easyocr>=1.7.0
 openpyxl>=3.1.5
 beautifulsoup4>=4.12.3
@@ -19,18 +20,35 @@ transformers>=4.44.2
 sentence-transformers>=3.1.1
 accelerate>=0.34.2
 safetensors>=0.4.5
+=======
+
+# ── ML / NLP core ─────────────────────────────────────────────────────────────
+torch==2.4.0
+transformers==4.44.2
+sentence-transformers==3.1.1
+accelerate==0.34.2
+safetensors==0.4.5
+>>>>>>> 3a27112 (Pushing major agent changes)
 
 # ── Local LLM for chatbot (no Ollama needed) ──────────────────────────────────
 # google/flan-t5-base is downloaded automatically via transformers
 # ~250MB, CPU-friendly, no API key required
+<<<<<<< HEAD
 sentencepiece>=0.2.0      # required by flan-t5 tokenizer
+=======
+sentencepiece==0.2.0      # required by flan-t5 tokenizer
+>>>>>>> 3a27112 (Pushing major agent changes)
 
 # ── RAG stack ─────────────────────────────────────────────────────────────────
 langchain==0.3.1
 langchain-community==0.3.1
 langchain-core==0.3.6
 langchain-text-splitters==0.3.0
+<<<<<<< HEAD
 faiss-cpu>=1.8.0
+=======
+faiss-cpu==1.8.0
+>>>>>>> 3a27112 (Pushing major agent changes)
 
 # ── Language detection ────────────────────────────────────────────────────────
 langdetect==1.0.9
@@ -40,9 +58,15 @@ langdetect==1.0.9
 # No extra package needed
 
 # ── Training utilities ────────────────────────────────────────────────────────
+<<<<<<< HEAD
 scikit-learn>=1.5.2
 pandas>=2.2.2
 numpy>=1.26.4
+=======
+scikit-learn==1.5.2
+pandas==2.2.2
+numpy==1.26.4
+>>>>>>> 3a27112 (Pushing major agent changes)
 
 # ── HTTP (kept for optional future integrations) ──────────────────────────────
 requests==2.32.3

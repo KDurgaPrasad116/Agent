@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-app: #FAFAF9;
+    --bg-surface: #FFFFFF;
+    --bg-surface-subtle: #F5F5F4;
+    --bg-canvas: #FFFFFF;
+
+    --border-hairline: rgba(15, 23, 42, 0.08);
+    --border-strong: rgba(15, 23, 42, 0.16);
+
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-legal: #1E293B;
+
+    --primary: #4F46E5;
+    --primary-hover: #4338CA;
+    --primary-subtle: #EEF2FF;
+    --primary-border: #C7D2FE;
+
+    --diff-del-bg: #FEE2E2;
+    --diff-del-text: #991B1B;
+    --diff-ins-bg: #DCFCE7;
+    --diff-ins-text: #166534;
+    --diff-mod-bg: #FEF3C7;
+    --diff-mod-text: #92400E;
+  }
+
+  .dark {
+    --bg-app: #0B0D12;
+    --bg-surface: #12151C;
+    --bg-surface-subtle: #181C26;
+    --bg-canvas: #151821;
+
+    --border-hairline: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
+    --text-legal: #E2E8F0;
+
+    --primary: #6366F1;
+    --primary-hover: #4F46E5;
+    --primary-subtle: #1E1B4B;
+    --primary-border: #312E81;
+
+    --diff-del-bg: rgba(239, 68, 68, 0.20);
+    --diff-del-text: #FCA5A5;
+    --diff-ins-bg: rgba(34, 197, 94, 0.20);
+    --diff-ins-text: #86EFAC;
+    --diff-mod-bg: rgba(245, 158, 11, 0.20);
+    --diff-mod-text: #FDE68A;
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Plus Jakarta Sans", Inter, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  /* Crisp 1px hairline card utilities */
+  .hairline-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 1rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hairline-card:hover {
+    border-color: var(--border-strong);
+  }
+
+  /* Paper document canvas for contracts */
+  .document-paper {
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-hairline);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    font-family: "Source Serif 4", Georgia, Cambria, serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-legal);
+    max-width: 72ch;
+  }
+
+  /* Dotted legal jargon tooltip triggers */
+  .legal-term-trigger {
+    text-decoration: underline dotted 1.5px rgba(79, 70, 229, 0.5);
+    text-underline-offset: 3px;
+    cursor: help;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+
+  .legal-term-trigger:hover {
+    color: var(--primary);
+    text-decoration-color: var(--primary);
+  }
+
+  /* Redline diff inline highlights */
+  .diff-token-del {
+    background-color: var(--diff-del-bg);
+    color: var(--diff-del-text);
+    text-decoration: line-through;
+    padding: 0.1em 0.3em;
+    border-radius: 0.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.9em;
+  }
+
+  .diff-token-ins {
+    background-color: var(--diff-ins-bg);
+    color: var(--diff-ins-text);
+    font-weight: 600;
+    padding: 0.1em 0.3em;
+    border-radius: 0.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.9em;
+  }
+
+  .diff-token-mod {
+    background-color: var(--diff-mod-bg);
+    color: var(--diff-mod-text);
+    padding: 0.1em 0.3em;
+    border-radius: 0.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.9em;
+  }
+
+  /* Thin precision scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}

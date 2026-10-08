@@ -94,17 +94,34 @@ def translate_to_english(text: str, source_lang: str) -> str:
 
 def _chunk_text(text: str, max_chars: int = 400) -> list[str]:
     """Split text into sentence-aware chunks under max_chars."""
+<<<<<<< HEAD
     sentences = text.replace("\n", " ").split(". ")
+=======
+    import re
+    sentences = re.split(r'(?<=[।\.\?!;:\n])\s*', text)
+>>>>>>> 3a27112 (Pushing major agent changes)
     chunks    = []
     current   = ""
 
     for sentence in sentences:
+<<<<<<< HEAD
         if len(current) + len(sentence) + 2 <= max_chars:
             current += sentence + ". "
         else:
             if current:
                 chunks.append(current.strip())
             current = sentence + ". "
+=======
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        if len(current) + len(sentence) + 2 <= max_chars:
+            current += sentence + " "
+        else:
+            if current:
+                chunks.append(current.strip())
+            current = sentence + " "
+>>>>>>> 3a27112 (Pushing major agent changes)
 
     if current.strip():
         chunks.append(current.strip())

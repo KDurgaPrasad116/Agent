@@ -1,0 +1,10 @@
+INTELLECTUAL PROPERTY AND EMPLOYMENT STANDARDS
+
+1. Perpetual and Irrevocable IP Assignments:
+While assignment of newly created deliverables developed specifically under a funded work-for-hire contract is standard, clauses demanding perpetual, worldwide, irrevocable ownership of an independent contractor's pre-existing intellectual property, background tools, open-source libraries, or unrelated personal creations without explicit carve-outs or separate royalties are abusive and overreaching.
+
+2. Termination for Convenience vs. Asymmetric Termination:
+A fair contract provides balanced termination rights with reasonable advance notice (typically 14 to 30 days) and compensation for work completed up to the date of termination. Clauses enabling one party to immediately terminate at will without notice or payment, while locking the other party into indefinite obligations, represent high contractual risk.
+
+3. Confidentiality Scope and Duration:
+Confidentiality obligations must clearly define confidential information and exclude publicly available knowledge, independently developed concepts, or disclosures required by law. Indefinite confidentiality over non-trade-secret standard business knowledge is unreasonable and impedes professional freedom.

@@ -29,7 +29,11 @@ def build_index():
             metadatas=[{"source": path.name}]
         )
         docs.extend(chunks)
+<<<<<<< HEAD
         print(f"  Loaded '{path.name}' → {len(chunks)} chunks")
+=======
+        print(f"  Loaded '{path.name}' -> {len(chunks)} chunks")
+>>>>>>> 3a27112 (Pushing major agent changes)
 
     if not docs:
         print("ERROR: All files were empty. Nothing to index.")

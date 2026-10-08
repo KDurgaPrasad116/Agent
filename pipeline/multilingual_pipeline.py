@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 # ── Reuse your existing clause splitter logic ─────────────────────────────────
 def _split_clauses(text: str) -> list[str]:
+<<<<<<< HEAD
     text = re.sub(r"[\r\n]+", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
 
@@ -58,6 +59,47 @@ _ILLEGAL_KW = [
 
 def _score_clause(clause: str, clause_type: str) -> dict:
     text = clause.lower()
+=======
+    if not text:
+        return []
+
+    # Normalize line breaks
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+
+    # Split across numbered sections, bullets, paragraph breaks, or sentence ends
+    raw = re.split(r'''(?xi)
+        \n+(?=\s*(?:\d+[\.\)]|\([a-z0-9]+\)|[•\-\*]|SECTION|ARTICLE|CLAUSE)\b) |
+        (?<=[.;:\u0964])\s*\n+ |
+        (?<=\.)\s+(?=[A-Z0-9]) |
+        (?<=;)\s+ |
+        \b(?=WHEREAS\b) |
+        \b(?=Notwithstanding\b) |
+        \b(?=Provided\s+that\b) |
+        \b(?=Subject\s+to\b)
+    ''', text)
+
+    clauses = []
+    for c in raw:
+        cleaned = re.sub(r'\s+', ' ', c).strip()
+        if len(cleaned) >= 25 and not re.fullmatch(r'[\d\W]+', cleaned):
+            clauses.append(cleaned)
+
+    if not clauses and text.strip():
+        clauses = [re.sub(r'\s+', ' ', text).strip()]
+
+    return clauses
+
+
+# ── Risk keyword scorer ───────────────────────────────────────────────────────
+_HIGH_RISK  = ["penalty","termination","liability","indemnif","breach","forfeit","consequential","benami","liquidated damages","gratification"]
+_MED_RISK   = ["warranty","confidential","exclusiv","intellectual property","non-compete","arbitration","jurisdiction","market value"]
+
+from agents.compliance_agent import ILLEGAL_PATTERNS as _ILLEGAL_KW
+
+
+def _score_clause(clause: str, clause_type: str, is_legal_ml: bool = True, orig_text: str = "") -> dict:
+    text = f"{clause} {orig_text}".lower()
+>>>>>>> 3a27112 (Pushing major agent changes)
     risk = 5
     flags = []
 
@@ -71,20 +113,39 @@ def _score_clause(clause: str, clause_type: str) -> dict:
             risk += 1
             flags.append(kw)
 
+<<<<<<< HEAD
     is_legal = True
     illegal_reason = None
     for pattern, msg in _ILLEGAL_KW:
         if re.search(pattern, text, re.I):
+=======
+    is_legal = is_legal_ml
+    illegal_reason = None
+    for pattern, msg in _ILLEGAL_KW:
+        if re.search(pattern, clause, re.IGNORECASE) or (orig_text and re.search(pattern, orig_text, re.IGNORECASE)):
+>>>>>>> 3a27112 (Pushing major agent changes)
             is_legal = False
             illegal_reason = msg
             risk += 3
             break
 
+<<<<<<< HEAD
+=======
+    if not is_legal_ml and not illegal_reason:
+        is_legal = False
+        illegal_reason = "Identified as unlawful/predatory by legality model"
+        risk += 3
+
+>>>>>>> 3a27112 (Pushing major agent changes)
     if clause_type == "Negative":
         risk += 1
 
     risk_score    = max(1, min(10, risk))
+<<<<<<< HEAD
     benefit_score = max(1, min(10, 10 - risk_score + (2 if clause_type == "Positive" else 0)))
+=======
+    benefit_score = 1 if not is_legal else max(1, min(10, 10 - risk_score + (2 if clause_type == "Positive" else 0)))
+>>>>>>> 3a27112 (Pushing major agent changes)
 
     return {
         "risk_score":      risk_score,
@@ -97,6 +158,24 @@ def _score_clause(clause: str, clause_type: str) -> dict:
 
 # ── Try to import trained models; graceful fallback to rule-based ─────────────
 def _load_classifier():
+<<<<<<< HEAD
+=======
+    import os
+    import joblib
+    ml_path = "models/saved/clause_classifier_ml.joblib"
+    if os.path.exists(ml_path):
+        try:
+            pipe = joblib.load(ml_path)
+            logger.info("Loaded trained ML clause classifier (85%+ accuracy).")
+            def classify(text: str) -> str:
+                probs = pipe.predict_proba([text])[0]
+                classes = list(pipe.classes_)
+                return classes[int(probs.argmax())]
+            return classify
+        except Exception as e:
+            logger.warning(f"Failed to load ML clause classifier ({e}).")
+
+>>>>>>> 3a27112 (Pushing major agent changes)
     try:
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
         import torch
@@ -114,7 +193,11 @@ def _load_classifier():
                 logits = model(**enc).logits
             return LABELS[int(logits.argmax())]
 
+<<<<<<< HEAD
         logger.info("Loaded trained clause classifier.")
+=======
+        logger.info("Loaded trained transformer clause classifier.")
+>>>>>>> 3a27112 (Pushing major agent changes)
         return classify
     except Exception as e:
         logger.warning(f"Trained classifier not found ({e}). Using rule-based fallback.")
@@ -131,6 +214,28 @@ def _load_classifier():
 
 
 def _load_legality_classifier():
+<<<<<<< HEAD
+=======
+    import os
+    import joblib
+    ml_path = "models/saved/legality_classifier_ml.joblib"
+    if os.path.exists(ml_path):
+        try:
+            pipe = joblib.load(ml_path)
+            logger.info("Loaded trained ML legality classifier (93%+ accuracy).")
+            def check(text: str) -> bool:
+                probs = pipe.predict_proba([text])[0]
+                classes = list(pipe.classes_)
+                if "Illegal" in classes:
+                    illegal_idx = classes.index("Illegal")
+                    if probs[illegal_idx] >= 0.50:
+                        return False
+                return True
+            return check
+        except Exception as e:
+            logger.warning(f"Failed to load ML legality classifier ({e}).")
+
+>>>>>>> 3a27112 (Pushing major agent changes)
     try:
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
         import torch
@@ -148,7 +253,11 @@ def _load_legality_classifier():
             label = model.config.id2label[int(logits.argmax())]
             return label == "Legal"
 
+<<<<<<< HEAD
         logger.info("Loaded trained legality classifier.")
+=======
+        logger.info("Loaded trained transformer legality classifier.")
+>>>>>>> 3a27112 (Pushing major agent changes)
         return check
     except Exception as e:
         logger.warning(f"Legality classifier not found ({e}). Using rule-based fallback.")
@@ -228,7 +337,11 @@ async def run_multilingual_pipeline(
 
         clause_type   = _classify(eng)
         legal_status  = _is_legal(eng)
+<<<<<<< HEAD
         scores        = _score_clause(eng, clause_type)
+=======
+        scores        = _score_clause(eng, clause_type, is_legal_ml=legal_status, orig_text=orig)
+>>>>>>> 3a27112 (Pushing major agent changes)
 
         # RAG context (optional)
         rag_context = None
@@ -238,6 +351,7 @@ async def run_multilingual_pipeline(
             except Exception:
                 pass
 
+<<<<<<< HEAD
         risk_scores.append(scores["risk_score"])
 
         results.append({
@@ -278,4 +392,66 @@ async def run_multilingual_pipeline(
         "illegal_clause_count": illegal_n,
         "decision":            decision,
         "clauses":             results,
+=======
+        action = "Reject" if not scores["is_legal"] or scores["risk_score"] >= 8 else ("Review" if scores["risk_score"] >= 5 or clause_type == "Negative" else "Accept")
+        explanation = f"{clause_type} clause. Risk: {scores['risk_score']}/10. Benefit: {scores['benefit_score']}/10."
+
+        risk_scores.append(scores["risk_score"])
+
+        results.append({
+            "clause":          eng,
+            "text":            eng,
+            "type":            clause_type,
+            "clause_type":     clause_type,
+            "text_original":   orig or eng,
+            "text_translated": eng,
+            "classification":  clause_type,
+            "legality":        "Legal" if scores["is_legal"] else "Illegal",
+            "is_legal":        scores["is_legal"],
+            "illegality_reason": scores["illegal_reason"],
+            "illegal_reason":  scores["illegal_reason"],
+            "risk_score":      scores["risk_score"],
+            "benefit_score":   scores["benefit_score"],
+            "risk_factors":    scores["risk_flags"],
+            "action":          action,
+            "explanation":     explanation,
+            "rag_context":     rag_context,
+        })
+
+    # Step 7 — Document-level summary
+    if results:
+        avg_risk    = sum(r["risk_score"] for r in results) / len(results)
+        avg_benefit = sum(r["benefit_score"] for r in results) / len(results)
+        illegal_n   = sum(1 for r in results if not r["is_legal"])
+        danger      = avg_risk * 0.40 + (10 - avg_benefit) * 0.25 + (illegal_n / len(results)) * 10 * 0.35
+
+        if danger >= 7 or illegal_n >= 3:
+            decision = "Do Not Sign"
+            reasoning = f"High Danger score {danger:.1f}/10. {illegal_n} statutory or predatory violations detected. Unacceptable risk exposure."
+        elif danger >= 4.5 or illegal_n >= 1:
+            decision = "Needs Review"
+            reasoning = f"Moderate Danger score {danger:.1f}/10. Flagged clauses or unbalanced risks identified. Legal review strongly advised."
+        else:
+            decision = "Safe to Sign"
+            reasoning = f"Low Danger score {danger:.1f}/10. No statutory violations detected. Terms are within normal balanced parameters."
+    else:
+        avg_risk    = 0.0
+        avg_benefit = 0.0
+        illegal_n   = 0
+        decision    = "Needs Review"
+        reasoning   = "No clauses found for analysis."
+
+    return {
+        "language_detected":    lang_info["name"],
+        "language_code":        lang_code,
+        "translated":           lang_info["needs_translation"],
+        "total_clauses":        len(results),
+        "overall_risk_score":   round(avg_risk, 1),
+        "avg_risk_score":       round(avg_risk, 1),
+        "overall_benefit_score": round(avg_benefit, 1),
+        "illegal_clause_count":  illegal_n,
+        "decision":             decision,
+        "decision_reasoning":   reasoning,
+        "clauses":              results,
+>>>>>>> 3a27112 (Pushing major agent changes)
     }

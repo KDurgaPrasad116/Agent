@@ -1,0 +1,33 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement ("Agreement") is entered into as of January 15, 2026, by and between Apex Global Holdings LLC ("Client") and NovaTech Digital Solutions Ltd ("Service Provider").
+
+Clause 1: Scope of Services and Revisions
+The Service Provider agrees to deliver software engineering and platform maintenance services. The Client may unilaterally expand the scope at any point without adjusting the fees or agreed delivery milestones.
+
+Clause 2: Payment and Punitive Deductions
+The Client shall pay the Service Provider within 90 days of receiving an invoice. If any milestone is delayed by more than 24 hours for any reason, the Client reserves the right to deduct 15% per day from the total contract fee as liquidated damages. In addition, overdue payments owed by Client shall bear 0% interest.
+
+Clause 3: Unlimited Indemnification
+The Service Provider agrees to unconditionally defend, indemnify, and hold harmless the Client, its affiliates, directors, and agents from any and all claims, losses, damages, legal fees, and liabilities arising out of or related to this Agreement, including claims caused solely by the Client's own negligence, willful misconduct, or fraud.
+
+Clause 4: Limitation of Liability
+The Client's total aggregate liability arising out of or related to this Agreement shall under no circumstances exceed the sum of $10.00 (Ten US Dollars). In contrast, the Service Provider shall have unlimited liability for any direct, indirect, incidental, punitive, or consequential damages.
+
+Clause 5: Unilateral Termination
+The Client may terminate this Agreement immediately at any time, with or without cause, without notice and without paying for any completed unbilled work. The Service Provider shall have no right to terminate this Agreement under any circumstance.
+
+Clause 6: Worldwide Perpetual Non-Compete
+During the term of this Agreement and for a period of ten (10) years following termination, the Service Provider and its key personnel shall not directly or indirectly provide any software, design, consulting, or engineering services to any competitor, enterprise, or business anywhere in the world.
+
+Clause 7: Intellectual Property Forfeiture
+All intellectual property, proprietary tools, prior inventions, libraries, and frameworks utilized or created by the Service Provider, whether developed prior to this Agreement or independently, shall become the sole and exclusive property of the Client upon signing.
+
+Clause 8: Confidentiality and Perpetual Gag
+The Service Provider agrees to maintain strict confidentiality perpetually. The Service Provider is strictly prohibited from disclosing this Agreement or filing any complaint with any court, regulatory body, or law enforcement agency regarding disputes under this Agreement.
+
+Clause 9: Sole Arbitrator Appointment
+Any dispute arising under this Agreement shall be referred to arbitration before a single arbitrator appointed unilaterally and solely by the Chief Legal Officer of the Client. The arbitrator's award shall be final and binding, and the Service Provider waives all rights of appeal or review.
+
+Clause 10: Governing Law and Unfavorable Forum
+This Agreement shall be governed exclusively by the laws of the Cayman Islands, and the Service Provider consents to the exclusive personal jurisdiction of courts located therein, regardless of the physical location of the parties.

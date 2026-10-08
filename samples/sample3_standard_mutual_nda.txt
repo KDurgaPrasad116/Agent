@@ -1,0 +1,27 @@
+MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is made and entered into on February 1, 2026, by and between Zenith Analytics Inc. ("Party A") and Horizon Cloud Systems Inc. ("Party B").
+
+Clause 1: Definition of Confidential Information
+"Confidential Information" means any proprietary information, technical data, trade secrets, software code, customer records, and commercial strategies disclosed by either party ("Disclosing Party") to the other party ("Receiving Party"), whether orally or in writing, that is designated as confidential or reasonably understood to be confidential.
+
+Clause 2: Exclusions from Confidentiality
+Confidential Information does not include information that: (a) is or becomes publicly available without breach of this Agreement; (b) was already known to the Receiving Party prior to disclosure; (c) is independently developed without reference to the Disclosing Party's information; or (d) is rightfully received from a third party without duty of confidentiality.
+
+Clause 3: Obligations of the Receiving Party
+The Receiving Party agrees to protect the Confidential Information using the same degree of care it uses for its own confidential information of like nature, but no less than reasonable care. The Receiving Party shall use Confidential Information solely to evaluate and pursue a potential business collaboration between the parties.
+
+Clause 4: Term and Duration
+This Agreement shall remain in effect for a period of two (2) years from the Effective Date. The confidentiality obligations regarding trade secrets shall survive until such information ceases to be a trade secret under applicable law.
+
+Clause 5: Permitted Disclosures and Subpoenas
+The Receiving Party may disclose Confidential Information to the extent required by applicable law, court order, or governmental subpoena, provided that the Receiving Party gives prompt written notice to the Disclosing Party to enable it to seek a protective order.
+
+Clause 6: Return or Destruction of Materials
+Upon written request or termination of discussions, the Receiving Party shall promptly return or certify destruction of all documents, summaries, and digital records containing Confidential Information.
+
+Clause 7: Mutual Limitation of Liability
+Neither party shall be liable for any indirect, special, incidental, or consequential damages arising out of this Agreement. Each party's total aggregate liability shall be limited to direct documented damages not exceeding $50,000.
+
+Clause 8: Governing Law and Dispute Resolution
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to conflict of law principles. Any dispute shall be resolved through binding arbitration under the rules of the American Arbitration Association in Dover, Delaware.

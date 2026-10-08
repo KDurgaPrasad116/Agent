@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legal AI Advisor — Enterprise Contract Risk &amp; Statutory Compliance Demo</title>
+  <meta name="description" content="Enterprise legal contract review and statutory compliance platform demonstrating dual-engine machine learning and legal RAG retrieval." />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="app-header no-print">
+    <div class="container nav-content">
+      <div class="brand-block" id="nav-brand">
+        <span class="brand-icon">⚖</span>
+        <div>
+          <span class="brand-title">Legal AI Advisor</span>
+          <span class="brand-tag">Enterprise Jurisprudence &amp; Compliance System</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <div class="status-chip" title="Calibrated LinearSVC &amp; FAISS RAG Retrieval Active">
+          <span class="status-dot"></span>
+          <span id="engine-badge-text">Dual ML + Statutory RAG Active (F1: 97.8%)</span>
+        </div>
+        <a href="/docs" target="_blank" class="header-btn">API Documentation</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="container main-content">
+    <!-- Demo Steps Breadcrumb -->
+    <section class="demo-steps-bar no-print">
+      <div class="step-item active" id="step-nav-1">
+        <span class="step-circle">1</span>
+        <span class="step-label">Select Document</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-item" id="step-nav-2">
+        <span class="step-circle">2</span>
+        <span class="step-label">Statutory &amp; Risk Analysis</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-item" id="step-nav-3">
+        <span class="step-circle">3</span>
+        <span class="step-label">Executive Findings &amp; Q&amp;A</span>
+      </div>
+    </section>
+
+    <!-- Document Ingestion Card -->
+    <section class="panel no-print" id="input-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Document Ingestion &amp; Demo Presets</h2>
+          <p class="panel-subtitle">Choose a pre-configured benchmark contract for immediate presentation or upload custom agreements.</p>
+        </div>
+      </div>
+
+      <!-- Quick Demo Presets Banner -->
+      <div class="presets-banner">
+        <div class="presets-title-row">
+          <span class="badge-accent">RECOMMENDED FOR DEMO</span>
+          <span class="presets-hint">Click any benchmark fixture to load instantly:</span>
+        </div>
+        <div class="presets-grid" id="presets-container">
+          <!-- Dynamically populated from /api/presets with quick descriptions -->
+        </div>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tab-btn-file" type="button">
+          Upload File (.PDF, .DOCX, .TXT)
+        </button>
+        <button class="mode-tab" id="tab-btn-text" type="button">
+          Direct Text / Paste Clauses
+        </button>
+      </div>
+
+      <!-- File Drop Area -->
+      <div class="tab-pane active" id="tab-pane-file">
+        <div class="drop-zone" id="file-dropzone">
+          <input type="file" id="file-input" accept=".pdf,.docx,.txt" />
+          <div class="drop-icon">📄</div>
+          <div class="drop-heading">Drag and drop your contract here, or <span class="link-text">browse files</span></div>
+          <div class="drop-subtext">Supports PDF, DOCX, and plain text contracts up to 25 MB</div>
+          <div class="selected-file-badge" id="selected-file-badge" style="display: none;">
+            <span id="selected-filename">sample_agreement.pdf</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Input Area -->
+      <div class="tab-pane" id="tab-pane-text">
+        <textarea 
+          class="contract-editor" 
+          id="text-input" 
+          placeholder="Paste full agreement text or specific contract clauses here for evaluation..."
+          rows="8"
+        ></textarea>
+      </div>
+
+      <!-- Execution Row -->
+      <div class="action-footer">
+        <div class="demo-tip">
+          <span class="tip-label">Demo Tip:</span> Evaluates Section 10, 23, 27, 28, 74 ICA, Transfer of Property Act, and arbitration clauses.
+        </div>
+        <button class="btn-execute" id="btn-brew-action" type="button">
+          Run Comprehensive Analysis
+        </button>
+      </div>
+
+      <!-- Analysis Progress Box -->
+      <div class="progress-container" id="brew-progress-box" style="display: none;">
+        <div class="progress-status-line">
+          <span class="spinner-box"></span>
+          <span id="brew-status-text">Extracting clauses and calibrating legal models...</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hidden / Dynamic Results Dashboard -->
+    <section class="results-wrapper" id="results-section" style="display: none;">
+      <!-- Results Toolbar -->
+      <div class="results-toolbar no-print">
+        <div class="results-meta">
+          <span class="badge-ready">ANALYSIS COMPLETE</span>
+          <span class="doc-meta-name" id="analyzed-filename">Document Evaluated</span>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" id="btn-export-pdf" type="button">
+            🖨 Print / Export PDF Report
+          </button>
+          <button class="btn-secondary" id="btn-reset-demo" type="button">
+            ↩ Analyze Another Document
+          </button>
+        </div>
+      </div>
+
+      <!-- Executive Verdict Banner -->
+      <div class="verdict-panel" id="verdict-banner-container">
+        <div class="verdict-lead">
+          <div class="verdict-status-header">
+            <span class="verdict-symbol" id="verdict-icon">⚖</span>
+            <div>
+              <div class="verdict-kicker">EXECUTIVE SIGNING RECOMMENDATION</div>
+              <h1 class="verdict-decision-text" id="verdict-title">Evaluation Complete</h1>
+            </div>
+          </div>
+          <p class="verdict-reasoning-text" id="verdict-subtitle">
+            Statutory compliance and risk calculations synthesized across dual ML classifiers and Indian legal statutes.
+          </p>
+          <div class="verdict-tag-wrap">
+            <span class="decision-badge" id="verdict-action-badge">NEEDS REVIEW</span>
+          </div>
+        </div>
+
+        <!-- 4 Key Metrics Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" id="metric-risk-box">
+            <div class="kpi-label">Overall Risk Score</div>
+            <div class="kpi-value" id="val-risk-score">0.0/10</div>
+            <div class="kpi-meter-track">
+              <div class="kpi-meter-fill risk-meter" id="meter-risk-fill" style="width: 0%;"></div>
+            </div>
+            <div class="kpi-sub" id="risk-severity-sub">Assessing...</div>
+          </div>
+
+          <div class="kpi-card" id="metric-benefit-box">
+            <div class="kpi-label">Favorable Benefit Score</div>
+            <div class="kpi-value" id="val-benefit-score">0.0/10</div>
+            <div class="kpi-meter-track">
+              <div class="kpi-meter-fill benefit-meter" id="meter-benefit-fill" style="width: 0%;"></div>
+            </div>
+            <div class="kpi-sub">Commercial Protection Index</div>
+          </div>
+
+          <div class="kpi-card" id="metric-illegal-box">
+            <div class="kpi-label">Statutory Violations</div>
+            <div class="kpi-value alert-text" id="val-illegal-count">0</div>
+            <div class="kpi-meter-track">
+              <div class="kpi-meter-fill violation-meter" id="meter-violation-fill" style="width: 0%;"></div>
+            </div>
+            <div class="kpi-sub" id="illegal-severity-sub">Unlawful Terms Flagged</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-label">Total Clauses Parsed</div>
+            <div class="kpi-value" id="val-total-clauses">0</div>
+            <div class="kpi-meter-track">
+              <div class="kpi-meter-fill" style="width: 100%; background-color: #3b82f6;"></div>
+            </div>
+            <div class="kpi-sub">Segmented &amp; Classified</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clause Inspection Workspace -->
+      <div class="panel clause-explorer-panel">
+        <div class="clause-explorer-header">
+          <div>
+            <h3>Clause Breakdown &amp; Statutory Risk Audit</h3>
+            <p class="panel-subtitle">Review classifications, individual risk calculations, and governing legal doctrines for every clause.</p>
+          </div>
+
+          <!-- Live Search / Keyword Filter -->
+          <div class="clause-search-wrap no-print">
+            <input 
+              type="text" 
+              class="clause-search-input" 
+              id="clause-search-box" 
+              placeholder="Search clauses (e.g. indemnity, non-compete, penalty, liability)..." 
+            />
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="clause-filter-bar no-print" id="clause-filters">
+          <button class="filter-chip active" data-filter="all">All Clauses (<span id="count-all">0</span>)</button>
+          <button class="filter-chip chip-illegal" data-filter="illegal">Statutory Violations (<span id="count-illegal">0</span>)</button>
+          <button class="filter-chip chip-risky" data-filter="bitter">High Risk (<span id="count-bitter">0</span>)</button>
+          <button class="filter-chip chip-favorable" data-filter="favorable">Favorable (<span id="count-favorable">0</span>)</button>
+          <button class="filter-chip" data-filter="standard">Standard / Neutral (<span id="count-standard">0</span>)</button>
+        </div>
+
+        <!-- Clauses Stack Container -->
+        <div class="clauses-container" id="clauses-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Interactive Legal Counsel Chat Assistant (Demo Showcase) -->
+      <div class="panel chat-panel no-print">
+        <div class="chat-header">
+          <div>
+            <h3>Interactive Document Q&amp;A (Legal RAG Assistant)</h3>
+            <p class="panel-subtitle">Converse with the grounded AI legal advisor regarding specific terms, liabilities, or negotiation strategies.</p>
+          </div>
+          <span class="chat-badge">Session RAG Memory Connected</span>
+        </div>
+
+        <!-- Stakeholder Demo Prompt Chips -->
+        <div class="demo-prompts-row">
+          <span class="demo-prompt-label">Quick Demo Questions:</span>
+          <button class="demo-chip" data-q="What are the top 3 dealbreaker clauses in this contract?">Dealbreaker clauses?</button>
+          <button class="demo-chip" data-q="Is the post-employment non-compete clause enforceable under Section 27 Indian Contract Act?">Is non-compete enforceable?</button>
+          <button class="demo-chip" data-q="What counter-proposals or modifications do you recommend for indemnification and liability?">Negotiation suggestions?</button>
+          <button class="demo-chip" data-q="Provide a 3-bullet executive summary of this contract for C-level leadership.">Executive summary</button>
+        </div>
+
+        <!-- Chat History Window -->
+        <div class="chat-history" id="chat-window">
+          <div class="chat-bubble counsel">
+            <div class="bubble-sender">Legal AI Advisor</div>
+            <div class="bubble-body">
+              Document clauses and statutory context have been indexed into session memory. You can ask specific questions regarding liabilities, statutory compliance, or negotiation counter-proposals.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="chat-controls">
+          <input 
+            type="text" 
+            class="chat-input-field" 
+            id="chat-query-input" 
+            placeholder="Ask any question about this contract's legal enforceability or risk exposure..." 
+          />
+          <button class="btn-send-chat" id="btn-chat-send" type="button">Ask Legal Counsel</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Clean Professional Footer -->
+  <footer class="app-footer no-print">
+    <div class="container footer-layout">
+      <div>
+        <strong>Legal AI Advisor</strong> &bull; Enterprise Legal Tech Demo Presentation
+      </div>
+      <div>
+        Dual Machine Learning Architecture &bull; Calibrated LinearSVC &bull; FAISS Statutory RAG Index
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

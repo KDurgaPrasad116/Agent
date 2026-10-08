@@ -1,5 +1,6 @@
 from PyPDF2 import PdfReader
 from docx import Document
+<<<<<<< HEAD
 import json
 import csv
 import io
@@ -12,12 +13,17 @@ class InputAgent:
     def __init__(self):
         self.ocr_reader = None
 
+=======
+
+class InputAgent:
+>>>>>>> 3a27112 (Pushing major agent changes)
     def run(self, file) -> str:
         name = file.filename.lower()
         if name.endswith(".pdf"):
             return self._pdf(file)
         elif name.endswith(".docx"):
             return self._docx(file)
+<<<<<<< HEAD
         elif name.endswith((".txt", ".md")):
             return file.file.read().decode("utf-8", errors="replace")
         elif name.endswith(".json"):
@@ -67,3 +73,17 @@ class InputAgent:
         img_array = np.array(img)
         results = self.ocr_reader.readtext(img_array, detail=0)
         return "\n".join(results)
+=======
+        elif name.endswith(".txt"):
+            return file.file.read().decode("utf-8", errors="replace")
+        raise ValueError("Unsupported format. Use PDF, DOCX, or TXT.")
+
+    def _pdf(self, file) -> str:
+        reader = PdfReader(file.file)
+        pages_text = [p.extract_text() or "" for p in reader.pages]
+        return "\n\n".join(t.strip() for t in pages_text if t.strip())
+
+    def _docx(self, file) -> str:
+        doc = Document(file.file)
+        return "\n".join(p.text.strip() for p in doc.paragraphs if p.text.strip())
+>>>>>>> 3a27112 (Pushing major agent changes)
