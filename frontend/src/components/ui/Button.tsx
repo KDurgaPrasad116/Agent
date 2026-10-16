@@ -5,6 +5,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
 }
@@ -14,6 +15,7 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'md',
   isLoading = false,
+  loading = false,
   leftIcon,
   rightIcon,
   disabled,
@@ -28,6 +30,8 @@ export const Button: React.FC<ButtonProps> = ({
     md: 'text-xs md:text-sm px-4 py-2 rounded-xl gap-2',
     lg: 'text-sm md:text-base px-5 py-2.5 rounded-xl gap-2.5 font-semibold',
   };
+
+  const busy = isLoading || loading;
 
   const variantStyles = {
     primary:
@@ -45,16 +49,16 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
-      disabled={disabled || isLoading}
+      disabled={disabled || busy}
       {...props}
     >
-      {isLoading ? (
+      {busy ? (
         <Loader2 className="w-4 h-4 animate-spin shrink-0" />
       ) : leftIcon ? (
         <span className="shrink-0">{leftIcon}</span>
       ) : null}
       <span>{children}</span>
-      {!isLoading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
+      {!busy && rightIcon && <span className="shrink-0">{rightIcon}</span>}
     </button>
   );
 };

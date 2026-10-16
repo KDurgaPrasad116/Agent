@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useLexClearStore } from '../../store/useLexClearStore';
-import { Badge, RiskBadge } from '../ui/Badge';
-import { Button } from '../ui/Button';
+import { RiskBadge } from '../ui/Badge';
 import {
   ZoomIn,
   ZoomOut,
   Copy,
   Check,
-  Maximize2,
   FileText,
   AlertTriangle,
-  Sparkles,
 } from 'lucide-react';
 
 export const DocumentReader: React.FC = () => {
@@ -43,7 +40,7 @@ export const DocumentReader: React.FC = () => {
         <div className="flex items-center gap-2 text-xs text-surface-500">
           <FileText className="w-3.5 h-3.5 text-primary-500" />
           <span className="font-medium font-sans">
-            Legal Audit Paper ({analyzeData.clauses.length} Segments)
+            {analyzeData.clauses.length} sections
           </span>
         </div>
 
@@ -88,13 +85,13 @@ export const DocumentReader: React.FC = () => {
           {/* Document Header Stamp */}
           <div className="border-b border-surface-200 dark:border-surface-800 pb-5 text-center space-y-1">
             <div className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-primary-600 dark:text-primary-400 font-bold px-2.5 py-0.5 rounded-full bg-primary-50 dark:bg-primary-950/60 border border-primary-200 dark:border-primary-800">
-              Deterministic Offset Audit Copy
+              Working copy
             </div>
             <h1 className="font-serif font-bold text-xl sm:text-2xl text-surface-900 dark:text-white pt-1">
               {(fileName ? fileName.replace(/\.[^/.]+$/, '') : (analyzeData.global_summary?.purpose?.slice(0, 40) || 'Legal Agreement')).toUpperCase()}
             </h1>
             <p className="text-xs text-surface-400 font-sans">
-              Click any clause below to trigger Grade 8 Layman Mode and statutory redline
+              Click a section to read it in plain English
             </p>
           </div>
 
@@ -162,8 +159,7 @@ export const DocumentReader: React.FC = () => {
 
           {/* End of Document Stamp */}
           <div className="text-center pt-8 border-t border-surface-200 dark:border-surface-800 text-[11px] font-mono text-surface-400 space-y-1">
-            <div>--- END OF CONTRACTUAL AUDIT COPY ---</div>
-            <div>LexClear SHA-256 Idempotency Verified • 0 Cloud Telemetry</div>
+            <div>— End of file —</div>
           </div>
         </div>
       </div>

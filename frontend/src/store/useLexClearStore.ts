@@ -6,8 +6,10 @@ import type {
   ClauseCorrection,
   RescoreResponse,
   ChatMessage,
+  PlatformConfig,
+  SampleContract,
+  DocumentUploadResult,
 } from '../types';
-import { SAMPLE_CONTRACTS, getMockClauseExplanation, getMockCorrections } from '../mocks/contracts';
 import { apiClient } from '../api/client';
 
 export type ActiveNavView = 'landing' | 'workspace' | 'generator' | 'methodology';
@@ -18,21 +20,67 @@ export interface ToastItem {
   type: 'success' | 'error' | 'info' | 'warning';
 }
 
+const THEME_KEY = 'lexclear-theme';
+
+function readStoredTheme(): boolean {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'dark') return true;
+    if (stored === 'light') return false;
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
+function applyTheme(isDark: boolean) {
+  if (isDark) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+  try {
+    localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+  } catch {
+    /* ignore */
+  }
+}
+
+function emptyConfig(): PlatformConfig {
+  return {
+    online: false,
+    service: 'LexClear',
+    version: '',
+    weights: {},
+    languages: [{ code: 'en', label: 'English' }],
+    accepted_uploads: ['pdf', 'docx', 'txt'],
+    max_upload_mb: 15,
+    export_formats: ['docx', 'pdf'],
+    export_modes: ['clean', 'tracked_changes'],
+    disclaimer: 'LexClear helps you read contracts. It is not legal advice.',
+  };
+}
+
+function welcomeMessage(): ChatMessage {
+  return {
+    id: 'welcome-msg',
+    role: 'assistant',
+    content: 'Ask about a clause, a payment term, or who can walk away. I’ll quote the document you opened.',
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    source: 'system',
+  };
+}
+
 interface LexClearState {
-  // Navigation & Theme
   activeView: ActiveNavView;
   setActiveView: (view: ActiveNavView) => void;
   isDark: boolean;
   setIsDark: (dark: boolean) => void;
   toggleTheme: () => void;
 
-  // Backend Connectivity
   backendStatus: 'checking' | 'online' | 'offline';
-  useMockMode: boolean;
-  setUseMockMode: (mock: boolean) => void;
+  platform: PlatformConfig;
+  samples: SampleContract[];
   checkBackendStatus: () => Promise<void>;
+  loadSamples: () => Promise<void>;
 
-  // Document & Analysis
   documentId: string | null;
   fileName: string;
   rawText: string;
@@ -40,22 +88,19 @@ interface LexClearState {
   isLoading: boolean;
   error: string | null;
 
-  // Selected Clause & Layman Mode
   selectedClauseId: string | null;
   selectedClause: Clause | null;
   clauseExplanation: ClauseExplanation | null;
   isExplaining: boolean;
-  explainLanguage: 'en' | 'hi' | 'kn';
-  setSelectedClauseId: (id: string | null) => void;
-  setExplainLanguage: (lang: 'en' | 'hi' | 'kn') => void;
+  explainLanguage: string;
+  setSelectedClauseId: (id: string | null) => Promise<void> | void;
+  setExplainLanguage: (lang: string) => Promise<void> | void;
 
-  // Workspace View Modes & Tabs
   workspaceTab: 'score' | 'explain' | 'changes' | 'chat';
   setWorkspaceTab: (tab: 'score' | 'explain' | 'changes' | 'chat') => void;
   diffViewMode: 'split' | 'inline';
   setDiffViewMode: (mode: 'split' | 'inline') => void;
 
-  // Redlines & Live Re-Score
   corrections: Record<string, ClauseCorrection>;
   rescoreResult: RescoreResponse | null;
   acceptCorrection: (clauseId: string) => void;
@@ -65,7 +110,6 @@ interface LexClearState {
   resetCorrections: () => void;
   rescoreWithPatches: () => Promise<void>;
 
-  // RAG Conversational Legal Assistant
   chatSessionId: string | null;
   chatMessages: ChatMessage[];
   isChatLoading: boolean;
@@ -74,17 +118,14 @@ interface LexClearState {
   sendChatMessage: (question: string) => Promise<void>;
   clearChatHistory: () => Promise<void>;
 
-  // Toasts
   toasts: ToastItem[];
   addToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
   removeToast: (id: string) => void;
 
-  // Modals
   isExportModalOpen: boolean;
   setExportModalOpen: (open: boolean) => void;
 
-  // Actions
-  loadPresetContract: (presetId: string) => void;
+  loadSampleContract: (sampleId: string) => Promise<void>;
   uploadAndAnalyzeText: (text: string, filename?: string) => Promise<void>;
   uploadAndAnalyzeFile: (file: File) => Promise<void>;
   clearDocument: () => void;
@@ -93,39 +134,37 @@ interface LexClearState {
 }
 
 export const useLexClearStore = create<LexClearState>((set, get) => ({
-  // Default Settings
   activeView: 'landing',
   setActiveView: (view) => set({ activeView: view }),
-  isDark: true,
+  isDark: readStoredTheme(),
   setIsDark: (isDark) => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyTheme(isDark);
     set({ isDark });
   },
-  toggleTheme: () => {
-    const next = !get().isDark;
-    get().setIsDark(next);
-  },
+  toggleTheme: () => get().setIsDark(!get().isDark),
 
-  // Backend Connectivity
   backendStatus: 'checking',
-  useMockMode: false,
-  setUseMockMode: (useMockMode) => {
-    set({ useMockMode });
-    get().addToast(
-      useMockMode ? 'Switched to 100% Offline Benchmark Mocks' : 'Switched to Live FastAPI Backend',
-      'info'
-    );
-  },
+  platform: emptyConfig(),
+  samples: [],
   checkBackendStatus: async () => {
     const health = await apiClient.checkHealth();
-    set({ backendStatus: health.online ? 'online' : 'offline' });
+    set({
+      platform: health,
+      backendStatus: health.online ? 'online' : 'offline',
+    });
+    if (health.online) {
+      await get().loadSamples();
+    }
+  },
+  loadSamples: async () => {
+    try {
+      const samples = await apiClient.listSamples();
+      set({ samples });
+    } catch {
+      set({ samples: [] });
+    }
   },
 
-  // Document & Analysis
   documentId: null,
   fileName: '',
   rawText: '',
@@ -133,7 +172,6 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  // Selected Clause & Layman Mode
   selectedClauseId: null,
   selectedClause: null,
   clauseExplanation: null,
@@ -149,80 +187,71 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
     const clause = data?.clauses.find((c) => c.id === id) || null;
     set({ selectedClauseId: id, selectedClause: clause, isExplaining: true });
 
-    // Fetch explanation dynamically
     try {
       const expl = await apiClient.explainClause(id, get().explainLanguage);
       set({ clauseExplanation: expl, isExplaining: false });
-    } catch {
-      set({
-        clauseExplanation: getMockClauseExplanation(id, get().explainLanguage),
-        isExplaining: false,
-      });
+    } catch (e: unknown) {
+      set({ isExplaining: false });
+      get().addToast(e instanceof Error ? e.message : 'Could not explain this clause', 'error');
     }
   },
   setExplainLanguage: async (lang) => {
     set({ explainLanguage: lang });
     const currentId = get().selectedClauseId;
-    if (currentId) {
-      try {
-        const expl = await apiClient.explainClause(currentId, lang);
-        set({ clauseExplanation: expl });
-      } catch {
-        set({ clauseExplanation: getMockClauseExplanation(currentId, lang) });
-      }
+    if (!currentId) return;
+    try {
+      const expl = await apiClient.explainClause(currentId, lang);
+      set({ clauseExplanation: expl });
+    } catch (e: unknown) {
+      get().addToast(e instanceof Error ? e.message : 'Could not switch language', 'error');
     }
   },
 
-  // Workspace View
   workspaceTab: 'score',
   setWorkspaceTab: (workspaceTab) => set({ workspaceTab }),
   diffViewMode: 'split',
   setDiffViewMode: (diffViewMode) => set({ diffViewMode }),
 
-  // Redlines & Live Re-score
   corrections: {},
   rescoreResult: null,
 
   acceptCorrection: (clauseId) => {
     const existing = get().corrections[clauseId];
-    if (existing) {
-      set({
-        corrections: {
-          ...get().corrections,
-          [clauseId]: { ...existing, status: 'accepted' },
-        },
-      });
-      get().addToast(`Accepted revision for clause ${existing.clause_title || clauseId}`, 'success');
-      get().rescoreWithPatches();
-    }
+    if (!existing) return;
+    set({
+      corrections: {
+        ...get().corrections,
+        [clauseId]: { ...existing, status: 'accepted' },
+      },
+    });
+    get().addToast(`Kept the rewrite for ${existing.clause_title || 'this clause'}`, 'success');
+    get().rescoreWithPatches();
   },
 
   rejectCorrection: (clauseId) => {
     const existing = get().corrections[clauseId];
-    if (existing) {
-      set({
-        corrections: {
-          ...get().corrections,
-          [clauseId]: { ...existing, status: 'rejected' },
-        },
-      });
-      get().addToast(`Rejected revision for clause ${existing.clause_title || clauseId}`, 'info');
-      get().rescoreWithPatches();
-    }
+    if (!existing) return;
+    set({
+      corrections: {
+        ...get().corrections,
+        [clauseId]: { ...existing, status: 'rejected' },
+      },
+    });
+    get().addToast(`Left ${existing.clause_title || 'this clause'} as written`, 'info');
+    get().rescoreWithPatches();
   },
 
   modifyCorrection: (clauseId, customText) => {
     const existing = get().corrections[clauseId];
-    if (existing) {
-      set({
-        corrections: {
-          ...get().corrections,
-          [clauseId]: { ...existing, revised_text: customText, status: 'modified' },
-        },
-      });
-      get().addToast('Custom revision saved and queued for re-score', 'success');
-      get().rescoreWithPatches();
-    }
+    if (!existing) return;
+    set({
+      corrections: {
+        ...get().corrections,
+        [clauseId]: { ...existing, revised_text: customText, status: 'modified' },
+      },
+    });
+    get().addToast('Saved your wording', 'success');
+    get().rescoreWithPatches();
   },
 
   acceptAllCorrections: () => {
@@ -231,7 +260,7 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
       updated[id] = { ...c, status: 'accepted' };
     }
     set({ corrections: updated });
-    get().addToast('Accepted all recommended redline amendments', 'success');
+    get().addToast('Applied every suggested rewrite', 'success');
     get().rescoreWithPatches();
   },
 
@@ -241,7 +270,7 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
       updated[id] = { ...c, status: 'pending' };
     }
     set({ corrections: updated, rescoreResult: null });
-    get().addToast('Reset redlines to initial contract baseline', 'info');
+    get().addToast('Rewrites reset', 'info');
   },
 
   rescoreWithPatches: async () => {
@@ -249,7 +278,7 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
     if (!docId) return;
 
     const acceptedPatches: Record<string, string> = {};
-    for (const [id, c] of Object.entries(get().corrections)) {
+    for (const c of Object.values(get().corrections)) {
       if (c.status === 'accepted' || c.status === 'modified') {
         acceptedPatches[c.clause_id] = c.revised_text;
       }
@@ -258,8 +287,6 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
     try {
       const rescore = await apiClient.rescore(docId, acceptedPatches);
       set({ rescoreResult: rescore });
-
-      // Update active analyzeData score preview
       if (get().analyzeData) {
         set({
           analyzeData: {
@@ -270,23 +297,13 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
           },
         });
       }
-    } catch (e) {
-      console.warn('Rescore error:', e);
+    } catch (e: unknown) {
+      get().addToast(e instanceof Error ? e.message : 'Could not recalculate the score', 'error');
     }
   },
 
-  // RAG Conversational Legal Assistant
   chatSessionId: null,
-  chatMessages: [
-    {
-      id: 'welcome-msg',
-      role: 'assistant',
-      content:
-        'Hello! I am your explainable legal intelligence assistant. Ask me questions about clauses, indemnities, liability caps, or potential risks in this document.',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'system',
-    },
-  ],
+  chatMessages: [welcomeMessage()],
   isChatLoading: false,
   isChatOpen: false,
   setChatOpen: (isChatOpen) => set({ isChatOpen }),
@@ -306,7 +323,12 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
       isChatLoading: true,
     });
 
-    const sessionId = get().chatSessionId || get().documentId || 'default-session';
+    const sessionId = get().chatSessionId || get().documentId;
+    if (!sessionId) {
+      set({ isChatLoading: false });
+      get().addToast('Open a contract first', 'warning');
+      return;
+    }
 
     try {
       const response = await apiClient.chat(sessionId, question);
@@ -316,17 +338,16 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
         content: response.answer,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         context_used: response.context_used,
-        source: 'rag',
+        source: (response.source as ChatMessage['source']) || 'rag',
       };
-
       set({
         chatMessages: [...get().chatMessages, assistantMsg],
         isChatLoading: false,
         chatSessionId: response.session_id || sessionId,
       });
-    } catch {
+    } catch (e: unknown) {
       set({ isChatLoading: false });
-      get().addToast('Failed to retrieve chat response', 'error');
+      get().addToast(e instanceof Error ? e.message : 'Chat failed', 'error');
     }
   },
 
@@ -336,111 +357,47 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
       try {
         await apiClient.clearChatSession(sessionId);
       } catch {
-        // fallback
+        /* local reset still happens */
       }
     }
-    set({
-      chatMessages: [
-        {
-          id: 'cleared-welcome',
-          role: 'assistant',
-          content: 'Conversation history cleared. How can I assist you with this document?',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          source: 'system',
-        },
-      ],
-    });
-    get().addToast('Conversation memory cleared', 'info');
+    set({ chatMessages: [welcomeMessage()] });
+    get().addToast('Chat cleared', 'info');
   },
 
-  // Toasts
   toasts: [],
   addToast: (message, type = 'info') => {
     const id = `toast-${Date.now()}-${Math.random()}`;
-    const newToast: ToastItem = { id, message, type };
-    set({ toasts: [...get().toasts, newToast] });
-
-    setTimeout(() => {
-      get().removeToast(id);
-    }, 4000);
+    set({ toasts: [...get().toasts, { id, message, type }] });
+    setTimeout(() => get().removeToast(id), 4000);
   },
   removeToast: (id) => {
     set({ toasts: get().toasts.filter((t) => t.id !== id) });
   },
 
-  // Modals
   isExportModalOpen: false,
   setExportModalOpen: (isExportModalOpen) => set({ isExportModalOpen }),
 
-  // Actions
-  loadPresetContract: (presetId) => {
-    const preset = SAMPLE_CONTRACTS.find((p) => p.id === presetId) || SAMPLE_CONTRACTS[0];
-    const initialCorrections: Record<string, ClauseCorrection> = {};
-
-    const mockCorr = getMockCorrections(preset.analyzeData.document_id);
-    for (const c of mockCorr.corrections) {
-      initialCorrections[c.clause_id] = c;
+  loadSampleContract: async (sampleId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const uploadRes = await apiClient.openSample(sampleId);
+      await hydrateFromUpload(get, set, uploadRes);
+      get().addToast('Sample opened. Scoring is live from the server.', 'success');
+    } catch (e: unknown) {
+      set({ isLoading: false, error: e instanceof Error ? e.message : 'Could not open sample' });
+      get().addToast(e instanceof Error ? e.message : 'Could not open sample', 'error');
     }
-
-    set({
-      documentId: preset.analyzeData.document_id,
-      fileName: `${preset.title}.txt`,
-      rawText: preset.rawText,
-      analyzeData: preset.analyzeData,
-      selectedClauseId: preset.analyzeData.clauses[0]?.id || null,
-      selectedClause: preset.analyzeData.clauses[0] || null,
-      corrections: initialCorrections,
-      rescoreResult: null,
-      workspaceTab: 'score',
-      activeView: 'workspace',
-      chatSessionId: preset.analyzeData.document_id,
-      error: null,
-    });
-
-    // Populate initial clause explanation
-    if (preset.analyzeData.clauses[0]) {
-      const expl = getMockClauseExplanation(preset.analyzeData.clauses[0].id, get().explainLanguage);
-      set({ clauseExplanation: expl });
-    }
-
-    get().addToast(`Loaded benchmark agreement: ${preset.title}`, 'success');
   },
 
   uploadAndAnalyzeText: async (text, filename = 'pasted_agreement.txt') => {
     set({ isLoading: true, error: null });
     try {
       const uploadRes = await apiClient.uploadText(text, filename);
-      const analysis = await apiClient.analyze(uploadRes.document_id);
-      const correctionsRes = await apiClient.getCorrections(uploadRes.document_id);
-
-      const correctionMap: Record<string, ClauseCorrection> = {};
-      for (const c of correctionsRes.corrections) {
-        correctionMap[c.clause_id] = c;
-      }
-
-      set({
-        documentId: uploadRes.document_id,
-        fileName: filename,
-        rawText: text,
-        analyzeData: analysis,
-        selectedClauseId: analysis.clauses[0]?.id || null,
-        selectedClause: analysis.clauses[0] || null,
-        corrections: correctionMap,
-        rescoreResult: null,
-        workspaceTab: 'score',
-        activeView: 'workspace',
-        chatSessionId: uploadRes.document_id,
-        isLoading: false,
-      });
-
-      if (analysis.clauses[0]) {
-        get().setSelectedClauseId(analysis.clauses[0].id);
-      }
-
-      get().addToast('Document successfully analyzed & segmented', 'success');
-    } catch (e: any) {
-      set({ isLoading: false, error: e.message || 'Analysis failed' });
-      get().addToast('Error during document analysis', 'error');
+      await hydrateFromUpload(get, set, uploadRes, text);
+      get().addToast('Finished reading the text you pasted', 'success');
+    } catch (e: unknown) {
+      set({ isLoading: false, error: e instanceof Error ? e.message : 'Analysis failed' });
+      get().addToast(e instanceof Error ? e.message : 'Analysis failed', 'error');
     }
   },
 
@@ -448,39 +405,15 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const uploadRes = await apiClient.uploadFile(file);
-      const analysis = await apiClient.analyze(uploadRes.document_id);
-      const correctionsRes = await apiClient.getCorrections(uploadRes.document_id);
-
-      const correctionMap: Record<string, ClauseCorrection> = {};
-      for (const c of correctionsRes.corrections) {
-        correctionMap[c.clause_id] = c;
+      let pasted = '';
+      if (file.name.toLowerCase().endsWith('.txt') || file.type.startsWith('text/')) {
+        pasted = await file.text();
       }
-
-      const fileContent = await file.text();
-
-      set({
-        documentId: uploadRes.document_id,
-        fileName: file.name,
-        rawText: fileContent || `[Uploaded binary: ${file.name}]`,
-        analyzeData: analysis,
-        selectedClauseId: analysis.clauses[0]?.id || null,
-        selectedClause: analysis.clauses[0] || null,
-        corrections: correctionMap,
-        rescoreResult: null,
-        workspaceTab: 'score',
-        activeView: 'workspace',
-        chatSessionId: uploadRes.document_id,
-        isLoading: false,
-      });
-
-      if (analysis.clauses[0]) {
-        get().setSelectedClauseId(analysis.clauses[0].id);
-      }
-
-      get().addToast(`Parsed ${uploadRes.clause_count} clauses from ${file.name}`, 'success');
-    } catch (e: any) {
-      set({ isLoading: false, error: e.message || 'File upload failed' });
-      get().addToast('File upload failed', 'error');
+      await hydrateFromUpload(get, set, uploadRes, pasted);
+      get().addToast(`Read ${uploadRes.clause_count} sections from ${file.name}`, 'success');
+    } catch (e: unknown) {
+      set({ isLoading: false, error: e instanceof Error ? e.message : 'Upload failed' });
+      get().addToast(e instanceof Error ? e.message : 'Upload failed', 'error');
     }
   },
 
@@ -496,21 +429,69 @@ export const useLexClearStore = create<LexClearState>((set, get) => ({
       corrections: {},
       rescoreResult: null,
       error: null,
+      chatMessages: [welcomeMessage()],
     });
   },
 
   deleteActiveDocument: async () => {
     const docId = get().documentId;
-    if (docId) {
+    if (!docId) return;
+    try {
       await apiClient.deleteDocument(docId);
       get().clearDocument();
-      get().addToast('Document deleted and wiped from database', 'info');
+      get().addToast('That file was removed from local storage', 'info');
+    } catch (e: unknown) {
+      get().addToast(e instanceof Error ? e.message : 'Could not delete', 'error');
     }
   },
 
   purgeAllData: async () => {
-    await apiClient.purgeAll();
-    get().clearDocument();
-    get().addToast('Database purged: All audit caches cleared', 'warning');
+    try {
+      await apiClient.purgeAll();
+      get().clearDocument();
+      get().addToast('Local files cleared', 'warning');
+    } catch (e: unknown) {
+      get().addToast(e instanceof Error ? e.message : 'Could not clear storage', 'error');
+    }
   },
 }));
+
+async function hydrateFromUpload(
+  get: () => LexClearState,
+  set: (partial: Partial<LexClearState>) => void,
+  uploadRes: DocumentUploadResult,
+  pastedText?: string
+) {
+  const analysis = await apiClient.analyze(uploadRes.document_id);
+  const correctionsRes = await apiClient.getCorrections(uploadRes.document_id);
+
+  const correctionMap: Record<string, ClauseCorrection> = {};
+  for (const c of correctionsRes.corrections) {
+    correctionMap[c.clause_id] = c;
+  }
+
+  const rawText =
+    pastedText ||
+    analysis.clauses.map((c) => `${c.title}\n${c.text}`).join('\n\n');
+
+  set({
+    documentId: uploadRes.document_id,
+    fileName: uploadRes.file_name,
+    rawText,
+    analyzeData: analysis,
+    selectedClauseId: analysis.clauses[0]?.id || null,
+    selectedClause: analysis.clauses[0] || null,
+    corrections: correctionMap,
+    rescoreResult: null,
+    workspaceTab: 'score',
+    activeView: 'workspace',
+    chatSessionId: uploadRes.document_id,
+    chatMessages: [welcomeMessage()],
+    isLoading: false,
+    error: null,
+  });
+
+  if (analysis.clauses[0]) {
+    await get().setSelectedClauseId(analysis.clauses[0].id);
+  }
+}

@@ -48,7 +48,7 @@ export const Badge: React.FC<BadgeProps> = ({
 };
 
 export interface RiskBadgeProps {
-  scoreOrBand: number | 'CRITICAL_RISK' | 'HIGH_RISK' | 'MODERATE_RISK' | 'LOW_RISK' | 'SAFE' | 'WARNING' | 'DANGER';
+  scoreOrBand: number | 'CRITICAL_RISK' | 'HIGH_RISK' | 'MEDIUM_RISK' | 'MODERATE_RISK' | 'LOW_RISK' | 'SAFE' | 'WARNING' | 'DANGER';
   className?: string;
   showScore?: boolean;
 }
@@ -77,6 +77,7 @@ export const RiskBadge: React.FC<RiskBadgeProps> = ({ scoreOrBand, className = '
         break;
       case 'WARNING':
       case 'MODERATE_RISK':
+      case 'MEDIUM_RISK':
         variant = 'warning';
         label = 'Moderate Risk';
         break;

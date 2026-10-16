@@ -1,18 +1,7 @@
 import React from 'react';
 import { useLexClearStore } from '../../store/useLexClearStore';
 import { Button } from '../ui/Button';
-import { Badge, RiskBadge } from '../ui/Badge';
-import {
-  BookOpen,
-  AlertTriangle,
-  Languages,
-  ArrowRight,
-  HelpCircle,
-  ShieldCheck,
-  CheckCircle2,
-  FileText,
-  Sparkles,
-} from 'lucide-react';
+import { BookOpen, AlertTriangle, ArrowRight } from 'lucide-react';
 
 export const LaymanExplainer: React.FC = () => {
   const {
@@ -22,6 +11,7 @@ export const LaymanExplainer: React.FC = () => {
     setExplainLanguage,
     setWorkspaceTab,
     isExplaining,
+    platform,
   } = useLexClearStore();
 
   if (!selectedClause) {
@@ -32,7 +22,7 @@ export const LaymanExplainer: React.FC = () => {
           No clause selected
         </h4>
         <p className="text-xs max-w-xs mx-auto">
-          Click any clause in the document canvas or sidebar to inspect Grade 8 Layman explanation.
+          Click a clause on the left or in the document to see it in plain English.
         </p>
       </div>
     );
@@ -63,36 +53,20 @@ export const LaymanExplainer: React.FC = () => {
 
         {/* Language Switcher */}
         <div className="flex items-center bg-surface-100 dark:bg-surface-950 p-0.5 rounded-lg border border-surface-200 dark:border-surface-800 text-xs shrink-0">
-          <button
-            onClick={() => setExplainLanguage('en')}
-            className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-              explainLanguage === 'en'
-                ? 'bg-white dark:bg-surface-850 font-bold text-primary-600 dark:text-primary-400 shadow-sm'
-                : 'text-surface-500 hover:text-surface-900'
-            }`}
-          >
-            EN
-          </button>
-          <button
-            onClick={() => setExplainLanguage('hi')}
-            className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-              explainLanguage === 'hi'
-                ? 'bg-white dark:bg-surface-850 font-bold text-primary-600 dark:text-primary-400 shadow-sm'
-                : 'text-surface-500 hover:text-surface-900'
-            }`}
-          >
-            हिन्दी
-          </button>
-          <button
-            onClick={() => setExplainLanguage('kn')}
-            className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
-              explainLanguage === 'kn'
-                ? 'bg-white dark:bg-surface-850 font-bold text-primary-600 dark:text-primary-400 shadow-sm'
-                : 'text-surface-500 hover:text-surface-900'
-            }`}
-          >
-            ಕನ್ನಡ
-          </button>
+          {platform.languages.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => setExplainLanguage(lang.code)}
+              className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors ${
+                explainLanguage === lang.code
+                  ? 'bg-white dark:bg-surface-850 font-bold text-primary-600 dark:text-primary-400 shadow-sm'
+                  : 'text-surface-500 hover:text-surface-900'
+              }`}
+            >
+              {lang.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -100,14 +74,16 @@ export const LaymanExplainer: React.FC = () => {
       <div className="space-y-2">
         <span className="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider block">
           {explainLanguage === 'en'
-            ? 'Grade 8 Plain-English Translation'
+            ? 'In plain English'
             : explainLanguage === 'hi'
             ? 'सरल भाषा में अनुवाद'
             : 'ಸರಳ ಭಾಷೆಯ ವಿವರಣೆ'}
         </span>
 
         <div className="p-4 rounded-xl bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-800 text-xs sm:text-sm text-surface-800 dark:text-surface-200 leading-relaxed shadow-sm">
-          {regionalText || clauseExplanation?.plain_english || selectedClause.text}
+              {isExplaining
+            ? 'Reading this clause…'
+            : regionalText || clauseExplanation?.plain_english || selectedClause.text}
         </div>
       </div>
 
@@ -128,7 +104,7 @@ export const LaymanExplainer: React.FC = () => {
       {clauseExplanation?.legal_terms && clauseExplanation.legal_terms.length > 0 && (
         <div className="space-y-2">
           <span className="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider block">
-            Legal Terms Jargon Buster
+            Words worth knowing
           </span>
 
           <div className="space-y-2">
@@ -153,7 +129,7 @@ export const LaymanExplainer: React.FC = () => {
       {clauseExplanation?.questions_for_lawyer && clauseExplanation.questions_for_lawyer.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-surface-200 dark:border-surface-800">
           <span className="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider block">
-            Questions for Legal Counsel
+            Questions to ask a lawyer
           </span>
 
           <ul className="space-y-2 text-xs text-surface-700 dark:text-surface-300">
@@ -175,7 +151,7 @@ export const LaymanExplainer: React.FC = () => {
         onClick={() => setWorkspaceTab('changes')}
         rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
       >
-        Inspect Balanced Redline
+        See suggested rewrite
       </Button>
     </div>
   );

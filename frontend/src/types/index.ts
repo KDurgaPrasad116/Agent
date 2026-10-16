@@ -178,14 +178,41 @@ export interface ChatResponse {
 export type ExportFormat = 'docx' | 'pdf' | 'json';
 export type ExportMode = 'clean' | 'tracked_changes';
 
-export interface PresetContract {
-  id: string;
+export interface LanguageOption {
+  code: string;
   label: string;
-  category: string;
+}
+
+export interface PlatformConfig {
+  online: boolean;
+  service: string;
+  version: string;
+  llm_provider?: string;
+  weights: Record<string, number>;
+  languages: LanguageOption[];
+  accepted_uploads: string[];
+  max_upload_mb: number;
+  export_formats: string[];
+  export_modes: string[];
+  disclaimer: string;
+}
+
+export interface SampleContract {
+  id: string;
   filename: string;
+  title: string;
+  category: string;
   description: string;
-  riskLevel: 'DANGER' | 'WARNING' | 'SAFE';
-  flaggedCount: number;
-  text: string;
+  file_type: string;
+}
+
+export interface DocumentUploadResult {
+  document_id: string;
+  file_name: string;
+  file_type?: string;
+  clause_count: number;
+  char_count: number;
+  sha256_hash?: string;
+  message?: string;
 }
 

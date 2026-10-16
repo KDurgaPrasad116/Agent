@@ -1,27 +1,17 @@
 import React, { useState } from 'react';
 import { useLexClearStore } from '../../store/useLexClearStore';
 import { ScoreRing } from '../ui/ScoreRing';
-import { Badge, RiskBadge } from '../ui/Badge';
-import {
-  ShieldAlert,
-  Calculator,
-  ChevronDown,
-  ChevronUp,
-  Info,
-  Layers,
-  Sparkles,
-  AlertCircle,
-  HelpCircle,
-} from 'lucide-react';
+import { RiskBadge } from '../ui/Badge';
+import { Calculator, ChevronDown, ChevronUp } from 'lucide-react';
 
 export const ScorePanel: React.FC = () => {
-  const { analyzeData, setSelectedClauseId, setWorkspaceTab } = useLexClearStore();
+  const { analyzeData } = useLexClearStore();
   const [showRadar, setShowRadar] = useState(true);
   const [showDerivation, setShowDerivation] = useState(true);
 
   if (!analyzeData) return null;
 
-  const { overall_score, risk_band, breakdown } = analyzeData;
+  const { overall_score, breakdown } = analyzeData;
 
   // Dynamic criteria mapping directly from backend evaluation payload
   const criteriaList = Object.entries(breakdown.criteria || {}).map(([key, data]) => ({
@@ -68,11 +58,11 @@ export const ScorePanel: React.FC = () => {
 
         <div className="text-right space-y-1">
           <span className="text-xs font-semibold text-surface-500 uppercase tracking-wider block">
-            Document Health
+            Overall score
           </span>
           <RiskBadge scoreOrBand={overall_score} showScore />
           <div className="text-[11px] font-mono text-surface-400">
-            {breakdown.total_deductions_count} total deductions recorded
+            {breakdown.total_deductions_count} issues counted
           </div>
         </div>
       </div>
@@ -81,7 +71,7 @@ export const ScorePanel: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-surface-900 dark:text-white uppercase tracking-wider">
-            5 Evaluation Pillars
+            Score breakdown
           </span>
           <span className="text-[11px] font-mono text-surface-400">Sum = 100%</span>
         </div>
@@ -123,7 +113,7 @@ export const ScorePanel: React.FC = () => {
           onClick={() => setShowRadar(!showRadar)}
           className="flex items-center justify-between w-full text-xs font-bold text-surface-800 dark:text-surface-200 uppercase tracking-wider"
         >
-          <span>Pillars Radar Polygon</span>
+          <span>Shape of the five scores</span>
           {showRadar ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
 
@@ -160,7 +150,7 @@ export const ScorePanel: React.FC = () => {
                 <span className="w-2.5 h-2.5 rounded-full bg-surface-300 dark:bg-surface-700" /> 100.0 Baseline
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-primary-500" /> Current Audit
+                <span className="w-2.5 h-2.5 rounded-full bg-primary-500" /> This file
               </span>
             </div>
           </div>
@@ -175,7 +165,7 @@ export const ScorePanel: React.FC = () => {
         >
           <span className="flex items-center gap-1.5">
             <Calculator className="w-3.5 h-3.5 text-primary-500" />
-            Mathematical Derivation Ledger
+            How the number was built
           </span>
           {showDerivation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
@@ -183,7 +173,7 @@ export const ScorePanel: React.FC = () => {
         {showDerivation && (
           <div className="space-y-2 pt-1 font-mono text-[11px] text-surface-600 dark:text-surface-300 leading-relaxed">
             <div className="p-2.5 rounded-lg bg-surface-100 dark:bg-surface-900 text-surface-700 dark:text-surface-300 border border-surface-200 dark:border-surface-800">
-              <span className="text-[10px] text-surface-400 block pb-1">CANONICAL FORMULA:</span>
+              <span className="text-[10px] text-surface-400 block pb-1">Formula</span>
               {breakdown.formula}
             </div>
 

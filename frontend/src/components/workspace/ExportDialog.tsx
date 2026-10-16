@@ -71,10 +71,10 @@ export const ExportDialog: React.FC = () => {
             </div>
             <div>
               <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">
-                Export & Data Sovereignty
+                Download or delete
               </h3>
               <p className="text-xs text-surface-500">
-                Generate finalized contracts or manage local database records
+                Take a copy with you, or remove it from this machine
               </p>
             </div>
           </div>
@@ -90,7 +90,7 @@ export const ExportDialog: React.FC = () => {
         {/* Export Options Cards */}
         <div className="space-y-3">
           <span className="text-xs font-bold text-surface-700 dark:text-surface-300 uppercase tracking-wider block">
-            Contract Deliverables
+            Downloads
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -144,7 +144,7 @@ export const ExportDialog: React.FC = () => {
                 Audit Certificate
               </div>
               <p className="text-[11px] text-surface-500 leading-snug">
-                Full legal report with 5-pillar mathematical score.
+                PDF copy of the scored agreement.
               </p>
             </button>
 
@@ -159,10 +159,10 @@ export const ExportDialog: React.FC = () => {
                 <span className="text-[10px] font-mono text-surface-400">.JSON</span>
               </div>
               <div className="font-bold text-xs text-surface-900 dark:text-white group-hover:text-primary-600">
-                Raw JSON Schema
+                JSON report
               </div>
               <p className="text-[11px] text-surface-500 leading-snug">
-                Machine-readable ledger for automated CI/CD pipelines.
+                Raw analysis for anyone who wants the numbers.
               </p>
             </button>
           </div>
@@ -171,7 +171,7 @@ export const ExportDialog: React.FC = () => {
         {/* Privacy & GDPR Data Erasure */}
         <div className="pt-3 border-t border-surface-200 dark:border-surface-800 space-y-3">
           <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider block">
-            GDPR & Data Sovereignty
+            Privacy on this machine
           </span>
 
           {!showPurgeConfirm ? (

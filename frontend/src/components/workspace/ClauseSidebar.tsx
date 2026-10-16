@@ -38,7 +38,7 @@ export const ClauseSidebar: React.FC = () => {
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-surface-900 dark:text-white uppercase tracking-wider">
-            Clause Index ({analyzeData.clauses.length})
+            Clauses ({analyzeData.clauses.length})
           </span>
           <span className="text-[11px] font-mono text-surface-400">
             {dangerCount + warnCount} flagged
@@ -133,7 +133,7 @@ export const ClauseSidebar: React.FC = () => {
               {hasDiff && (
                 <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 pl-3.5">
                   <FileDiff className="w-3 h-3" />
-                  <span>Suggested Redline Ready</span>
+                  <span>Rewrite waiting</span>
                 </div>
               )}
             </button>

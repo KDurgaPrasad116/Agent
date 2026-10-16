@@ -1,338 +1,232 @@
 import React, { useState } from 'react';
 import { useLexClearStore } from '../../store/useLexClearStore';
 import { Button } from '../ui/Button';
-import { Badge, RiskBadge } from '../ui/Badge';
-import { ScoreRing } from '../ui/ScoreRing';
-import { InteractiveDiagrams } from '../diagrams/InteractiveDiagrams';
-import { SAMPLE_CONTRACTS } from '../../mocks/contracts';
+import { Badge } from '../ui/Badge';
 import {
-  ShieldCheck,
   FileText,
-  Sparkles,
   ArrowRight,
-  Layers,
-  CheckCircle2,
-  AlertTriangle,
-  RotateCcw,
   BookOpen,
   ChevronDown,
   ChevronUp,
-  Cpu,
   Lock,
-  Zap,
+  Scale,
+  PenLine,
+  Search,
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
-  const { setActiveView, loadPresetContract } = useLexClearStore();
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const { setActiveView, loadSampleContract, samples, platform, backendStatus, isLoading } =
+    useLexClearStore();
+  const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
   const faqs = [
     {
-      q: 'Is LexClear a substitute for hiring a qualified attorney?',
-      a: 'No. LexClear is an automated informational intelligence platform designed to help professionals and consumers spot risky clauses and understand legalese. It does not provide formal legal representation or legal advice.',
+      q: 'Does this replace a lawyer?',
+      a: 'No. It flags one-sided wording and translates dense clauses into everyday language. For anything you might sign, talk to counsel.',
     },
     {
-      q: 'How does the scoring formula derive its numbers?',
-      a: 'Every document starts from a Base of 100.0 across 5 pillars: Clarity (25%), Completeness (20%), Fairness (20%), Legal Risk (25%), and Compliance (10%). Deductions are mathematically recorded and summed using statutory and contractual rules.',
+      q: 'Where does the score come from?',
+      a: platform.weights && Object.keys(platform.weights).length
+        ? `Each file starts at 100. Points come off five areas: ${Object.entries(platform.weights)
+            .map(([k, v]) => `${k.replace(/_/g, ' ')} (${Math.round(Number(v) * 100)}%)`)
+            .join(', ')}. The breakdown is on the score tab after you open a file.`
+        : 'Each file starts at 100. Points come off five areas such as fairness and legal risk. You can see every deduction after you open a file.',
     },
     {
-      q: 'Are confidential agreements sent to third-party AI models?',
-      a: 'No. By default, LexClear operates 100% locally in private heuristic mode with an isolated local SQLite database. No contract text is sold, retained, or leaked to public training corpuses.',
+      q: 'Does my contract leave this computer?',
+      a: 'By default it stays in a local database on this machine. You can delete a file, or wipe everything, from the export dialog.',
     },
     {
-      q: 'How does auto-correction avoid modifying business terms?',
-      a: 'Our correction engine preserves project milestones, compensation amounts, and role titles while surgically rewriting unbalanced clauses using established statutory mutuality principles.',
+      q: 'Will rewrites change prices or dates?',
+      a: 'Suggested edits aim at balance — notice periods, liability, termination — not at inventing new commercial terms. You can reject or rewrite any suggestion before export.',
     },
   ];
 
-  return (
-    <div className="space-y-24 pb-20">
-      {/* 1. HERO SECTION */}
-      <section className="pt-8 md:pt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Value Proposition & CTAs */}
-          <div className="lg:col-span-6 space-y-6">
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-surface-900 dark:text-white leading-[1.1] tracking-tight">
-              Audit, demystify and redline{' '}
-              <span className="text-primary-600 dark:text-primary-400">contracts</span> in real time.
-            </h1>
+  const firstSample = samples[0];
 
-            <p className="text-base sm:text-lg text-surface-600 dark:text-surface-400 leading-relaxed max-w-xl">
-              Deterministic mathematical health scores, clause-level plain-English translations, and surgical statutory redlining. Built for founders, legal ops, and consumers.
+  return (
+    <div className="space-y-20 pb-16">
+      <section className="pt-6 md:pt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <p className="text-xs font-semibold tracking-wide text-primary-700 dark:text-primary-300 uppercase">
+              Contract reader for people who did not go to law school
+            </p>
+            <h1 className="font-heading text-4xl sm:text-5xl font-bold text-surface-900 dark:text-white leading-[1.12] tracking-tight">
+              See the unfair parts before you sign.
+            </h1>
+            <p className="text-base text-surface-600 dark:text-surface-400 leading-relaxed max-w-xl">
+              Drop in a PDF, Word file, or pasted text. LexClear splits it into clauses, scores the
+              rough edges, and offers a plainer rewrite you can accept or ignore.
             </p>
 
-            {/* Hero CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <Button
                 variant="primary"
                 size="lg"
-                onClick={() => loadPresetContract('predatory-vendor')}
+                loading={isLoading}
+                onClick={() => {
+                  if (firstSample && backendStatus === 'online') {
+                    loadSampleContract(firstSample.id);
+                  } else {
+                    setActiveView('workspace');
+                  }
+                }}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                Audit a Contract
+                {firstSample ? `Try “${firstSample.title}”` : 'Open the workspace'}
               </Button>
               <Button
                 variant="secondary"
                 size="lg"
                 onClick={() => setActiveView('generator')}
-                leftIcon={<FileText className="w-4 h-4 text-surface-500" />}
+                leftIcon={<FileText className="w-4 h-4" />}
               >
-                Generate Agreement
+                Draft a new agreement
               </Button>
             </div>
 
-            {/* Quick Demo Trigger Hint */}
-            <div className="pt-3 flex items-center gap-2 text-xs text-surface-500 font-medium">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              <span>Click "Audit a Contract" to test the live Predatory Agreement demo</span>
-            </div>
+            {backendStatus === 'offline' && (
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                The API isn’t running. Start the backend, then refresh — samples and scoring need it.
+              </p>
+            )}
           </div>
 
-          {/* Right Column: Live Interactive Clause Mockup */}
           <div className="lg:col-span-6">
-            <div className="hairline-card p-6 md:p-8 space-y-5 shadow-floating bg-surface-50/50 dark:bg-surface-900/90 relative">
-              <div className="flex items-center justify-between pb-4 border-b border-surface-200 dark:border-surface-800">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="text-xs font-mono font-bold text-surface-700 dark:text-surface-300">
-                    Clause 4 • Liability Cap Audit
-                  </span>
-                </div>
-                <RiskBadge scoreOrBand="DANGER" />
+            <div className="hairline-card p-6 md:p-8 space-y-4 bg-white dark:bg-surface-900">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-surface-700 dark:text-surface-200">
+                  What a one-sided cap looks like
+                </span>
+                <Badge variant="danger">High risk</Badge>
               </div>
-
-              {/* Serif Clause Snippet */}
-              <div className="p-4 rounded-xl bg-white dark:bg-surface-950 border border-surface-200 dark:border-surface-850 font-serif text-sm leading-relaxed text-surface-800 dark:text-surface-200">
-                "The Client's aggregate liability shall not exceed{' '}
-                <span className="diff-token-del">$10.00</span>. In contrast, the Service Provider shall have{' '}
-                <span className="diff-token-del">unlimited liability</span> for any damages."
-              </div>
-
-              {/* Micro Explanation Card */}
-              <div className="p-4 rounded-xl bg-red-50/70 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-xs space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-red-700 dark:text-red-400">Severe Asymmetry Detected</span>
-                  <span className="font-mono text-red-600 dark:text-red-400 font-bold">-20.0 pts Legal Risk</span>
-                </div>
-                <p className="text-surface-600 dark:text-surface-300 leading-normal">
-                  Statutory mutuality violation: Service provider is exposed to boundless financial ruin while the counterparty is fully immune.
-                </p>
-                <div className="pt-2 border-t border-red-200/60 dark:border-red-900/40 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Rebalanced: Cap at 12 months fees
-                  </span>
-                  <span className="text-[11px] font-bold text-primary-600 dark:text-primary-400">
-                    Delta: +20.0 pts
-                  </span>
-                </div>
-              </div>
+              <p className="font-serif text-sm leading-relaxed text-surface-800 dark:text-surface-200">
+                “The Client’s liability shall not exceed{' '}
+                <span className="diff-token-del">$10.00</span>. The Service Provider shall have{' '}
+                <span className="diff-token-del">unlimited liability</span>.”
+              </p>
+              <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
+                In plain terms: they barely pay if they cause harm; you can be on the hook for
+                everything. A fairer version usually caps both sides at a multiple of fees.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. TRUST STRIP */}
-      <section className="border-y border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-              <Lock className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-surface-900 dark:text-white">Private by Design</div>
-              <div className="text-xs text-surface-500">100% offline heuristic mode with private SQLite isolation.</div>
-            </div>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {[
+          {
+            icon: <Lock className="w-5 h-5" />,
+            title: 'Stays on this machine',
+            body: 'Files land in local storage. Nothing is sold, and you can wipe it.',
+          },
+          {
+            icon: <BookOpen className="w-5 h-5" />,
+            title: 'Plain language',
+            body: 'Click a clause and get what it actually does to you, plus questions to ask a lawyer.',
+          },
+          {
+            icon: <Scale className="w-5 h-5" />,
+            title: 'A score you can audit',
+            body: 'Every deduction points at a sentence. No mystery number.',
+          },
+        ].map((item) => (
+          <div key={item.title} className="hairline-card p-5 space-y-2">
+            <div className="text-primary-600 dark:text-primary-400">{item.icon}</div>
+            <h3 className="font-heading font-semibold text-sm text-surface-900 dark:text-white">
+              {item.title}
+            </h3>
+            <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">{item.body}</p>
           </div>
-
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-950/50 border border-primary-200 dark:border-primary-800/80 flex items-center justify-center text-primary-600 dark:text-primary-400 shrink-0">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-surface-900 dark:text-white">Plain-English Explanations</div>
-              <div className="text-xs text-surface-500">Grade 8 plain language summaries and lawyer consultation tips.</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 justify-center md:justify-start">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-surface-900 dark:text-white">Transparent Mathematical Scoring</div>
-              <div className="text-xs text-surface-500">Every deduction is traceable to a specific statute or risk pattern.</div>
-            </div>
-          </div>
-        </div>
+        ))}
       </section>
 
-      {/* 3. FOUR CORE CAPABILITIES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <Badge variant="primary">Platform Features</Badge>
-          <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-surface-900 dark:text-white">
-            Four pillars of contract intelligence
+      <section className="space-y-8">
+        <div className="max-w-2xl">
+          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white">
+            Four things it actually does
           </h2>
-          <p className="text-sm text-surface-600 dark:text-surface-400">
-            A comprehensive suite engineered to replace guesswork with deterministic verification.
+          <p className="text-sm text-surface-600 dark:text-surface-400 mt-2">
+            Same workflow you’d expect from a careful junior associate, minus the billable hour.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="hairline-card p-6 space-y-4 hover:border-primary-500 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600">
-              <ScoreRing score={88} size={28} strokeWidth={4} showLabel={false} />
-            </div>
-            <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">1. Audit & Score</h3>
-            <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
-              5-pillar weighted evaluation (Clarity, Completeness, Fairness, Legal Risk, Compliance) with step deduction waterflow.
-            </p>
-          </div>
-
-          <div className="hairline-card p-6 space-y-4 hover:border-primary-500 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-950/50 border border-primary-200 dark:border-primary-800 flex items-center justify-center text-primary-600">
-              <BookOpen className="w-5 h-5" />
-            </div>
-            <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">2. Demystify & Translate</h3>
-            <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
-              Slide-out layman drawer translating legalese into practical everyday scenarios with English and Hindi toggle support.
-            </p>
-          </div>
-
-          <div className="hairline-card p-6 space-y-4 hover:border-primary-500 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600">
-              <RotateCcw className="w-5 h-5" />
-            </div>
-            <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">3. Auto-Correct & Diff</h3>
-            <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
-              Interactive redline studio offering balanced statutory alternatives. Accept or edit changes and watch the score heal in real time.
-            </p>
-          </div>
-
-          <div className="hairline-card p-6 space-y-4 hover:border-primary-500 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-purple-600">
-              <FileText className="w-5 h-5" />
-            </div>
-            <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">4. Guided Generator</h3>
-            <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
-              Step-by-step wizard creating custom, legally sound agreements (NDA, Lease, Employment, Service) with pre-export scoring.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. HOW IT WORKS STEPPER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <Badge variant="primary">Processing Pipeline</Badge>
-          <h2 className="font-heading text-3xl font-extrabold text-surface-900 dark:text-white">
-            How LexClear processes your agreement
-          </h2>
-          <p className="text-sm text-surface-600 dark:text-surface-400">
-            A 4-step pipeline that preserves exact character offsets and guarantees zero text truncation.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { step: '01', title: 'Ingest & Hash', desc: 'Accepts PDF, DOCX, or TXT. Computes SHA-256 digest to verify integrity.' },
-            { step: '02', title: 'Clause Slicing', desc: 'Identifies clause boundaries and character offsets without altering wording.' },
-            { step: '03', title: 'Statutory Audit', desc: 'Runs 25+ deterministic doctrine checks across Contract and Property Law.' },
-            { step: '04', title: 'Surgical Diff', desc: 'Generates word-level redline diff tokens with one-click acceptance.' },
-          ].map((s) => (
-            <div key={s.step} className="hairline-card p-6 space-y-3">
-              <div className="font-mono text-xs font-bold text-primary-600 dark:text-primary-400">
-                STEP {s.step}
-              </div>
-              <h4 className="font-heading font-bold text-sm text-surface-900 dark:text-white">{s.title}</h4>
-              <p className="text-xs text-surface-500 leading-relaxed">{s.desc}</p>
+            { icon: <Search className="w-4 h-4" />, title: 'Read & score', body: 'Splits the file and marks clauses that look one-sided or incomplete.' },
+            { icon: <BookOpen className="w-4 h-4" />, title: 'Explain', body: 'Turns legal English into what happens if you miss a deadline or get sued.' },
+            { icon: <PenLine className="w-4 h-4" />, title: 'Suggest edits', body: 'Shows original vs rewrite. Keep, skip, or type your own line.' },
+            { icon: <FileText className="w-4 h-4" />, title: 'Draft from a template', body: 'Fill names and numbers. The generator uses the server’s template list.' },
+          ].map((card) => (
+            <div key={card.title} className="hairline-card p-5 space-y-3">
+              <div className="text-primary-600">{card.icon}</div>
+              <h3 className="font-heading font-semibold text-sm">{card.title}</h3>
+              <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">{card.body}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 5. INTERACTIVE ENGINEERING SCHEMATICS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <InteractiveDiagrams />
-      </section>
-
-      {/* 6. SAMPLE BENCHMARK CONTRACTS SHOWCASE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <Badge variant="primary">Interactive Benchmarks</Badge>
-          <h2 className="font-heading text-3xl font-extrabold text-surface-900 dark:text-white">
-            Try a pre-loaded contract audit
-          </h2>
-          <p className="text-sm text-surface-600 dark:text-surface-400">
-            Experience the scoring dial, clause inspector, and live redline studio in one click.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {SAMPLE_CONTRACTS.map((sample) => (
-            <div
-              key={sample.id}
-              className="hairline-card p-6 flex flex-col justify-between hover:border-primary-500 transition-colors"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant={sample.initialScore >= 75 ? 'success' : 'danger'}>
-                    {sample.category}
-                  </Badge>
-                  <RiskBadge scoreOrBand={sample.initialScore} showScore />
+      {samples.length > 0 && (
+        <section className="space-y-6">
+          <div>
+            <h2 className="font-heading text-2xl font-bold text-surface-900 dark:text-white">
+              Sample files on disk
+            </h2>
+            <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
+              These come from the project’s samples folder, not from canned scores in the browser.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {samples.map((sample) => (
+              <button
+                key={sample.id}
+                type="button"
+                disabled={isLoading || backendStatus !== 'online'}
+                onClick={() => loadSampleContract(sample.id)}
+                className="hairline-card p-5 text-left space-y-3 hover:border-primary-400 transition-colors disabled:opacity-60"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant="neutral">{sample.category}</Badge>
+                  <span className="text-[11px] text-surface-400 uppercase">{sample.file_type}</span>
                 </div>
-                <h3 className="font-heading font-bold text-base text-surface-900 dark:text-white">
+                <h3 className="font-heading font-semibold text-base text-surface-900 dark:text-white">
                   {sample.title}
                 </h3>
-                <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
-                  {sample.subtitle}
+                <p className="text-xs text-surface-600 dark:text-surface-400 leading-relaxed line-clamp-3">
+                  {sample.description}
                 </p>
-              </div>
+                <span className="text-xs font-semibold text-primary-600 inline-flex items-center gap-1">
+                  Open and score <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
-              <div className="pt-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => loadPresetContract(sample.id)}
-                  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
-                >
-                  Load in Analyzer Workspace
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 7. FAQ ACCORDION */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="font-heading text-2xl font-bold text-surface-900 dark:text-white">
-            Frequently Asked Questions
-          </h2>
-        </div>
-
-        <div className="space-y-3">
+      <section className="max-w-3xl space-y-4">
+        <h2 className="font-heading text-2xl font-bold text-surface-900 dark:text-white">
+          Straight answers
+        </h2>
+        <div className="space-y-2">
           {faqs.map((faq, idx) => {
             const isOpen = activeFaq === idx;
             return (
-              <div key={idx} className="hairline-card overflow-hidden">
+              <div key={faq.q} className="hairline-card overflow-hidden">
                 <button
+                  type="button"
                   onClick={() => setActiveFaq(isOpen ? null : idx)}
-                  className="w-full p-4 text-left text-sm font-semibold text-surface-900 dark:text-white flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-850 transition-colors"
+                  className="w-full p-4 text-left text-sm font-semibold flex items-center justify-between gap-3"
                 >
                   <span>{faq.q}</span>
-                  {isOpen ? (
-                    <ChevronUp className="w-4 h-4 text-surface-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-surface-400" />
-                  )}
+                  {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
                 {isOpen && (
-                  <div className="p-4 pt-0 text-xs text-surface-600 dark:text-surface-300 leading-relaxed border-t border-surface-100 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-950/40">
+                  <p className="px-4 pb-4 text-sm text-surface-600 dark:text-surface-300 leading-relaxed">
                     {faq.a}
-                  </div>
+                  </p>
                 )}
               </div>
             );
@@ -340,31 +234,16 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 8. FINAL CTA BAND */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="hairline-card bg-surface-900 text-white p-8 md:p-12 text-center space-y-6 max-w-4xl mx-auto border-surface-800">
-          <h2 className="font-heading text-3xl font-extrabold tracking-tight">
-            Ready to audit your legal contracts?
-          </h2>
-          <p className="text-sm text-surface-300 max-w-xl mx-auto leading-relaxed">
-            Gain complete clarity over commercial commitments, identify predatory clauses, and rebalance agreements with confidence.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => loadPresetContract('predatory-vendor')}
-            >
-              Analyze Benchmark Document
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => setActiveView('generator')}
-            >
-              Draft New Agreement
-            </Button>
-          </div>
+      <section className="hairline-card p-8 md:p-10 text-center space-y-4 bg-surface-900 text-white border-surface-800">
+        <h2 className="font-heading text-2xl sm:text-3xl font-bold">Bring a contract. We’ll mark it up.</h2>
+        <p className="text-sm text-surface-300 max-w-lg mx-auto">{platform.disclaimer}</p>
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          <Button variant="primary" size="lg" onClick={() => setActiveView('workspace')}>
+            Go to workspace
+          </Button>
+          <Button variant="secondary" size="lg" onClick={() => setActiveView('generator')}>
+            Start from a template
+          </Button>
         </div>
       </section>
     </div>

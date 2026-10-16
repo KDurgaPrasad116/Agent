@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import os
 
 from backend.app.database import init_db
@@ -12,6 +12,8 @@ from backend.app.routes.explain import router as explain_router
 from backend.app.routes.correct import router as correct_router
 from backend.app.routes.generator import router as generator_router
 from backend.app.routes.export import router as export_router
+from backend.app.routes.samples import router as samples_router
+from backend.app.routes.chat import router as chat_router
 
 from contextlib import asynccontextmanager
 
@@ -21,8 +23,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="LexClear - AI Legal Document Analyzer & Corrector",
-    description="Explainable, transparent, AI-powered legal document analysis, correction, and generation platform.",
+    title="LexClear",
+    description="Read a contract, see the one-sided clauses, and optionally rewrite them. Not legal advice.",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -42,23 +44,27 @@ app.include_router(explain_router)
 app.include_router(correct_router)
 app.include_router(generator_router)
 app.include_router(export_router)
-
-try:
-    from routes.chat import router as chat_router
-    app.include_router(chat_router, prefix="/api")
-except Exception as e:
-    print(f"Chat router optional load: {e}")
+app.include_router(samples_router)
+app.include_router(chat_router)
 
 
 @app.get("/api/health")
 def health_check():
     return {
         "status": "healthy",
-        "service": "LexClear Core API",
+        "service": "LexClear",
         "version": "1.0.0",
         "llm_provider": settings.LLM_PROVIDER,
         "weights": settings.weights_dict,
-        "disclaimer": "This tool provides informational analysis, not legal advice."
+        "languages": [
+            {"code": "en", "label": "English"},
+            {"code": "hi", "label": "हिन्दी"},
+        ],
+        "accepted_uploads": ["pdf", "docx", "txt"],
+        "max_upload_mb": 15,
+        "export_formats": ["docx", "pdf"],
+        "export_modes": ["clean", "tracked_changes"],
+        "disclaimer": "LexClear helps you read contracts. It is not legal advice and it does not replace a lawyer.",
     }
 
 # Mount static frontend assets if available
@@ -79,7 +85,7 @@ def serve_index():
 async def serve_spa_and_static(full_path: str):
     # Pass through API and docs
     if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
-        return {"error": "Resource not found"}
+        return JSONResponse({"error": "Resource not found"}, status_code=404)
     static_file_path = os.path.join("frontend/dist", full_path)
     if os.path.isfile(static_file_path):
         return FileResponse(static_file_path)

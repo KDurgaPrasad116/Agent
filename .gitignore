@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Models
-models/saved/
-
-# Faiss index (can be large)
-rag/faiss_index/
-=======
 # ── Environment & secrets ────────────────────────────────────────────────────
 .env
 .env.local
@@ -52,6 +33,8 @@ MANIFEST
 venv/
 ENV/
 env/
+env.bak/
+venv.bak/
 
 # Testing & type checking
 .pytest_cache/
@@ -132,4 +115,3 @@ Desktop.ini
 *.njsproj
 *.sln
 *.sw?
->>>>>>> 3a27112 (Pushing major agent changes)

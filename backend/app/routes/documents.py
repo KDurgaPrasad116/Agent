@@ -144,6 +144,23 @@ def get_document_clauses(document_id: str, db: Session = Depends(get_db)):
         clauses=dtos
     )
 
+@router.delete("/purge/all")
+def purge_all_data(db: Session = Depends(get_db)):
+    """
+    Privacy purge: wipes all stored documents and analysis records from SQLite.
+    """
+    db.query(CorrectionModel).delete()
+    db.query(DeductionModel).delete()
+    db.query(ScoreModel).delete()
+    db.query(ClauseModel).delete()
+    db.query(DocumentModel).delete()
+    db.query(GeneratedDocumentModel).delete()
+    db.commit()
+    return {
+        "status": "success",
+        "message": "All user data, documents, and derived tables purged completely."
+    }
+
 @router.delete("/{document_id}")
 def delete_document_data(document_id: str, db: Session = Depends(get_db)):
     """
@@ -160,21 +177,4 @@ def delete_document_data(document_id: str, db: Session = Depends(get_db)):
         "status": "success",
         "deleted_id": document_id,
         "message": "All document data and derived analyses have been permanently purged."
-    }
-
-@router.delete("/purge/all")
-def purge_all_data(db: Session = Depends(get_db)):
-    """
-    Privacy purge: wipes all stored documents and analysis records from SQLite.
-    """
-    db.query(CorrectionModel).delete()
-    db.query(DeductionModel).delete()
-    db.query(ScoreModel).delete()
-    db.query(ClauseModel).delete()
-    db.query(DocumentModel).delete()
-    db.query(GeneratedDocumentModel).delete()
-    db.commit()
-    return {
-        "status": "success",
-        "message": "All user data, documents, and derived tables purged completely."
     }

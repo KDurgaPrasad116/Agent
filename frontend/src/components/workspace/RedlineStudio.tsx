@@ -2,19 +2,7 @@ import React, { useState } from 'react';
 import { useLexClearStore } from '../../store/useLexClearStore';
 import { Button } from '../ui/Button';
 import { Badge, RiskBadge } from '../ui/Badge';
-import {
-  RotateCcw,
-  CheckCircle2,
-  XCircle,
-  FileDiff,
-  Edit3,
-  Sparkles,
-  TrendingUp,
-  Columns,
-  AlignJustify,
-  ShieldCheck,
-  Scale,
-} from 'lucide-react';
+import { RotateCcw, FileDiff, Edit3, TrendingUp, Columns, AlignJustify } from 'lucide-react';
 
 export const RedlineStudio: React.FC = () => {
   const {
@@ -55,7 +43,7 @@ export const RedlineStudio: React.FC = () => {
         <div>
           <h4 className="font-heading font-bold text-sm text-surface-900 dark:text-white flex items-center gap-2">
             <FileDiff className="w-4 h-4 text-primary-500" />
-            <span>Statutory Redline Studio</span>
+            <span>Suggested edits</span>
           </h4>
           <p className="text-xs text-surface-500">
             {acceptedCount} of {correctionsList.length} amendments applied
@@ -118,7 +106,8 @@ export const RedlineStudio: React.FC = () => {
             </div>
             <div>
               <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
-                Document Health Healed: +{rescoreResult.delta} Points
+                Score moved {rescoreResult.delta > 0 ? '+' : ''}
+                {rescoreResult.delta}
               </div>
               <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
                 Baseline {rescoreResult.before_score.toFixed(1)} → New Score{' '}
@@ -192,7 +181,7 @@ export const RedlineStudio: React.FC = () => {
                   {/* Proposed Redline */}
                   <div className="p-3 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300 space-y-1">
                     <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
-                      Balanced Amendment
+                      Suggested rewrite
                     </span>
                     {isEditing ? (
                       <textarea
@@ -226,7 +215,7 @@ export const RedlineStudio: React.FC = () => {
                     size="sm"
                     onClick={() => acceptCorrection(patch.clause_id)}
                   >
-                    {isAccepted ? 'Accepted' : 'Accept Redline'}
+                    {isAccepted ? 'Kept' : 'Keep this'}
                   </Button>
 
                   <Button
